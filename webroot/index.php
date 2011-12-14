@@ -1,9 +1,20 @@
 <?php
+	$ROOT = '/';
+
 	function error404() {
 		$page = $_SERVER['REQUEST_URI'];
 		header('HTTP/1.0 404 Not Found');
-		include('errors/404.php');
+		include('../errors/404.php');
 		die();
+	}
+
+	function snippet($name, $args = array()) {
+		global $ROOT;
+		extract($args);
+
+		ob_start();
+		include("../snippets/$name.php");
+		return ob_get_clean();
 	}
 
 	if(isset($_GET['url'])) {
@@ -26,12 +37,12 @@
 		$action = $args[1];
 	}
 
-	$controllerFile = "controllers/$controller.php";
+	$controllerFile = "../controllers/$controller.php";
 	if(!file_exists($controllerFile)) {
 		error404();
 	}
-	$viewFile = "views/$controller/$action.php";
-	$layoutFile = 'layouts/default.php';
+	$viewFile = "../views/$controller/$action.php";
+	$layoutFile = '../layouts/default.php';
 
 	include($controllerFile);
 
