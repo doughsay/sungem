@@ -7,22 +7,20 @@
 	if(isset($_GET['url'])) {
 		$args = explode('/', $_GET['url']);
 		if($args[count($args)-1] == '') { array_pop($args); }
-		$n = count($args);
 	}
 	else {
 		$args = array();
-		$n = 0;
 	}
 
 	$controller = 'home';
 	$action = 'index';
 
-	if($n >= 1) {
-		$controller = $args[0];
+	if(count($args) >= 1) {
+		$controller = array_shift($args);
 	}
 
-	if($n > 1) {
-		$action = $args[1];
+	if(count($args) >= 1) {
+		$action = array_shift($args);
 	}
 
 	$controllerFile = "../controllers/$controller.php";
@@ -39,7 +37,7 @@
 		else { error404(); }
 	}
 
-	extract($action($args));
+	extract(call_user_func_array($action, $args));
 
 	if(!file_exists($viewFile)) {
 		if($DEBUG) { noSuchView($controllerFile); }
