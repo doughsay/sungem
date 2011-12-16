@@ -1,24 +1,12 @@
 <?php
 	$ROOT = '/';
+	$DEBUG = true;
 
-	function error404() {
-		$page = $_SERVER['REQUEST_URI'];
-		header('HTTP/1.0 404 Not Found');
-		include('../errors/404.php');
-		die();
-	}
-
-	function snippet($name, $args = array()) {
-		global $ROOT;
-		extract($args);
-
-		ob_start();
-		include("../snippets/$name.php");
-		return ob_get_clean();
-	}
+	require('../lib/helper_functions.php');
 
 	if(isset($_GET['url'])) {
 		$args = explode('/', $_GET['url']);
+		if($args[count($args)-1] == '') { array_pop($args); }
 		$n = count($args);
 	}
 	else {
@@ -39,24 +27,27 @@
 
 	$controllerFile = "../controllers/$controller.php";
 	if(!file_exists($controllerFile)) {
-		error404();
+		if($DEBUG) { noSuchController($controllerFile); }
+		else { error404(); }
 	}
 	$viewFile = "../views/$controller/$action.php";
 	$layoutFile = '../layouts/default.php';
 
 	include($controllerFile);
-
 	if(!function_exists($action)) {
-		error404();
+		if($DEBUG) { noSuchAction($action, $controllerFile); }
+		else { error404(); }
 	}
 
 	extract($action($args));
 
 	if(!file_exists($viewFile)) {
-		error404();
+		if($DEBUG) { noSuchView($controllerFile); }
+		else { error404(); }
 	}
 	if(!file_exists($layoutFile)) {
-		error404();
+		if($DEBUG) { noSuchLayout($controllerFile); }
+		else { error404(); }
 	}
 
 	ob_start();
