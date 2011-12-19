@@ -1,5 +1,5 @@
 <?php
-	function index($args) {
+	function index() {
 		//do stuff here
 
 		return array(
