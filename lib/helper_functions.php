@@ -38,6 +38,17 @@ function snippet($name, $args = array()) {
 }
 
 function lib($lib) {
-	require("../lib/$lib.php");
+	require_once("../lib/$lib.php");
+}
+
+function initDb() {
+	require_once('../config/db.php');
+	return new PDO($dsn, $username, $password, array(
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+	));
+}
+
+function loadModel($model) {
+	require_once("../models/$model.php");
 }
 ?>

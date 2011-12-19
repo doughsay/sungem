@@ -1,0 +1,6 @@
+<?php
+
+$ROOT = '/';
+$DEBUG = true;
+
+?>

@@ -1,8 +1,6 @@
 <?php
 
-$ROOT = '/';
-$DEBUG = true;
-
+require('../config/core.php');
 require('../lib/helper_functions.php');
 
 if(isset($_GET['url'])) {
