@@ -29,7 +29,6 @@ function noSuchLayout($layoutFile) {
 }
 
 function snippet($name, $args = array()) {
-	global $ROOT;
 	extract($args);
 
 	ob_start();

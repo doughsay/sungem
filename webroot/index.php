@@ -29,7 +29,7 @@ $view = $action;
 
 $controllerFile = "../controllers/$controller.php";
 if(!file_exists($controllerFile)) {
-	if($DEBUG) { noSuchController($controllerFile); }
+	if(DEBUG) { noSuchController($controllerFile); }
 	else { error404(); }
 }
 
@@ -37,7 +37,7 @@ if(!file_exists($controllerFile)) {
 include($controllerFile);
 
 if(!function_exists($action)) {
-	if($DEBUG) { noSuchAction($action, $controllerFile); }
+	if(DEBUG) { noSuchAction($action, $controllerFile); }
 	else { error404(); }
 }
 
@@ -48,11 +48,11 @@ $viewFile = "../views/$controller/$view.php";
 $layoutFile = "../layouts/$layout.php";
 
 if(!file_exists($viewFile)) {
-	if($DEBUG) { noSuchView($viewFile); }
+	if(DEBUG) { noSuchView($viewFile); }
 	else { error404(); }
 }
 if(!file_exists($layoutFile)) {
-	if($DEBUG) { noSuchLayout($layoutFile); }
+	if(DEBUG) { noSuchLayout($layoutFile); }
 	else { error404(); }
 }
 
