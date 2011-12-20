@@ -8,7 +8,15 @@ function pr($x) {
 function error404() {
 	$page = $_SERVER['REQUEST_URI'];
 	header('HTTP/1.0 404 Not Found');
+	//TODO exist check
 	include('../errors/404.php');
+	die();
+}
+
+function error500() {
+	header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
+	//TODO exist check
+	include('../errors/500.php');
 	die();
 }
 
@@ -28,26 +36,38 @@ function noSuchLayout($layoutFile) {
 	die("There is no such layout file: $layoutFile");
 }
 
+function noSuchModel($modelFile) {
+	die("There is no such model file: $modelFile");
+}
+
 function snippet($name, $args = array()) {
 	extract($args);
 
 	ob_start();
+	//TODO exist check
 	include("../snippets/$name.php");
 	return ob_get_clean();
 }
 
 function lib($lib) {
+	//TODO exist check
 	require_once("../lib/$lib.php");
 }
 
 function initDb() {
 	require_once('../config/db.php');
-	return new PDO($dsn, $username, $password, array(
-		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+	return new PDO(DSN, USERNAME, PASSWORD, array(
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
 	));
 }
 
 function loadModel($model) {
-	require_once("../models/$model.php");
+	$modelFile = "../models/$model.php";
+	if(!file_exists($modelFile)) {
+		if(DEBUG) { noSuchModel($modelFile); }
+		else { error500(); }
+	}
+	require_once($modelFile);
 }
 ?>

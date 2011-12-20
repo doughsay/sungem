@@ -56,9 +56,8 @@ function parseDigest($txt) {
 	return $needed_parts ? false : $data;
 }
 
-function getValidResponse($realm, $digest, $users) {
-	$A1 = md5($digest['username'].':'.$realm.':'.
-		$users[$digest['username']]['password']);
+function getValidResponse($realm, $digest, $pass) {
+	$A1 = md5($digest['username'].':'.$realm.':'.$pass);
 	$A2 = md5($_SERVER['REQUEST_METHOD'].':'.$digest['uri']);
 	return md5(
 		$A1.':'.$digest['nonce'].':'.$digest['nc'].':'.$digest['cnonce'].':'.
@@ -66,7 +65,7 @@ function getValidResponse($realm, $digest, $users) {
 	);
 }
 
-function requireLogin($realm, $users, $parish) {
+function requireLogin($realm, $validUser, $passForUser) {
 	$nonce = uniqid();
 
 	$digestStr = getDigest();
@@ -77,15 +76,13 @@ function requireLogin($realm, $users, $parish) {
 	$digest = parseDigest($digestStr);
 
 	// quick check
-	if(
-		!isset($users[$digest['username']]) ||
-		!in_array($parish, $users[$digest['username']]['allowedParishes'])
-	) {
+	if(!$validUser($digest['username'])) {
 		loginHeaders($realm, $nonce);
 	}
 
 	// secure check
-	if($digest['response'] != getValidResponse($realm, $digest, $users)) {
+	$pass = $passForUser($digest['username']);
+	if($digest['response'] != getValidResponse($realm, $digest, $pass)) {
 		loginHeaders($realm, $nonce);
 	}
 }
