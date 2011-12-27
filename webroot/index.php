@@ -3,6 +3,11 @@
 require('../config/core.php');
 require('../lib/helper_functions.php');
 
+if(DEBUG) {
+	error_reporting(E_ALL & ~E_NOTICE);
+	ini_set("display_errors", 1);
+}
+
 if(isset($_GET['url'])) {
 	$args = explode('/', $_GET['url']);
 	if($args[count($args)-1] == '') { array_pop($args); }
@@ -12,9 +17,9 @@ else {
 }
 
 // some defaults
-$controller = 'home';
-$action = 'index';
-$layout = 'default';
+$controller = DEFAULT_CONTROLLER;
+$action = DEFAULT_ACTION;
+$layout = DEFAULT_LAYOUT;
 
 if(count($args) >= 1) {
 	$controller = array_shift($args);
