@@ -47,7 +47,10 @@ if(!function_exists($action)) {
 }
 
 // call the action, this can overwrite many of the variables defined so far
-extract(call_user_func_array($action, $args));
+$vars = call_user_func_array($action, $args);
+if(is_array($vars)) {
+	extract($vars);
+}
 
 $viewFile = "../views/$controller/$view.php";
 $layoutFile = "../layouts/$layout.php";
