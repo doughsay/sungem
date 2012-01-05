@@ -2,7 +2,9 @@
 useLib('mysql');
 
 function validUser($username, $password) {
-	$saltedPassword = sha1(SALT . $password);
+	$conf = getConfig('core');
+	$salt = $conf['salt'];
+	$saltedPassword = sha1($salt . $password);
 
 	$db = initDb();
 	$st = $db->prepare("

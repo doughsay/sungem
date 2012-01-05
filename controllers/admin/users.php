@@ -7,7 +7,7 @@ function index() {
 
 	$username = $_SESSION['admin_user'];
 	return array(
-		'title' => 'Admin Section',
+		'pageTitle' => 'Admin Section',
 		'username' => $username
 	);
 }
@@ -28,7 +28,7 @@ function login() {
 	}
 
 	return array(
-		'title' => Login,
+		'pageTitle' => 'Login',
 		'css' => array('admin'),
 		'error' => $error
 	);

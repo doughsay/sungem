@@ -13,7 +13,7 @@ function index() {
 
 	// return variables to the view
 	return array(
-		'title' => 'Home!',
+		'pageTitle' => 'Home!',
 		'foo' => 'This is foo!',
 		'bar' => 'And bar!',
 		'strings' => $strings,

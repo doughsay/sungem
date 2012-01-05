@@ -3,14 +3,12 @@
 	<head>
 		<title>
 			<?php
-				echo TITLE;
-				if(isset($title)) {
-					echo TITLE_SEPARATOR . $title;
+				echo $title;
+				if(isset($pageTitle)) {
+					echo $titleSeparator . $pageTitle;
 				}
 			?>
 		</title>
-
-		<script type='text/javascript' src='/js/jquery-1.7.1.min.js'></script>
 
 		<?php if(isset($json)): ?>
 			<script type='text/javascript'>
@@ -32,10 +30,10 @@
 		<?php endforeach; endif; ?>
 	</head>
 	<body>
-		<h1><?php echo TITLE; ?></h1>
+		<h1><?php echo $title; ?></h1>
 		<div id='Main'>
-			<?php if(isset($title)): ?>
-				<h2><?php echo $title; ?></h2>
+			<?php if(isset($pageTitle)): ?>
+				<h2><?php echo $pageTitle; ?></h2>
 			<?php endif; ?>
 			<hr>
 			<?php echo $content; ?>

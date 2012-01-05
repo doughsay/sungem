@@ -49,6 +49,12 @@ function snippet($name, $args = array()) {
 	return ob_get_clean();
 }
 
+function getConfig($conf) {
+	//TODO exist check
+	require_once("../config/$conf.php");
+	return $conf();
+}
+
 function useLib($lib) {
 	//TODO exist check
 	require_once("../lib/$lib.php");

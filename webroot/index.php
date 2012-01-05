@@ -1,9 +1,8 @@
 <?php
-
-require('../config/core.php');
 require('../lib/core.php');
+extract(getConfig('core'));
 
-if(DEBUG) {
+if($debug) {
 	error_reporting(E_ALL & ~E_NOTICE);
 	ini_set("display_errors", 1);
 }
@@ -26,7 +25,7 @@ if(count($args) >= 1 && in_array($args[0], $areas)) {
 
 // include area config, could override core config
 if($area !== '') {
-	require("../config/$area.php");
+	extract(getConfig($area));
 }
 
 // some defaults
@@ -48,15 +47,15 @@ $view = $action;
 
 $controllerFile = "../controllers/$areaPath$controller.php";
 if(!file_exists($controllerFile)) {
-	if(DEBUG) { noSuchController($controllerFile); }
+	if($debug) { noSuchController($controllerFile); }
 	else { error404(); }
 }
 
 // include the controller, this can overwrite variables defined so far
-include($controllerFile);
+require_once($controllerFile);
 
 if(!function_exists($action)) {
-	if(DEBUG) { noSuchAction($action, $controllerFile); }
+	if($debug) { noSuchAction($action, $controllerFile); }
 	else { error404(); }
 }
 
@@ -70,19 +69,19 @@ $viewFile = "../views/$areaPath$controller/$view.php";
 $layoutFile = "../layouts/$layout.php";
 
 if(!$skipView && !file_exists($viewFile)) {
-	if(DEBUG) { noSuchView($viewFile); }
+	if($debug) { noSuchView($viewFile); }
 	else { error404(); }
 }
 if(!file_exists($layoutFile)) {
-	if(DEBUG) { noSuchLayout($layoutFile); }
+	if($debug) { noSuchLayout($layoutFile); }
 	else { error404(); }
 }
 
 ob_start();
 if(!$skipView) {
-	include($viewFile);
+	require_once($viewFile);
 	$content = ob_get_clean();
 }
-include($layoutFile);
+require_once($layoutFile);
 
 ?>
