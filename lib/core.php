@@ -5,18 +5,28 @@ function pr($x) {
 	print('</pre>');
 }
 
+function assocFallback($a, $k, $f) {
+	return isset($a[$k])
+		? $a[$k]
+		: $f;
+}
+
 function error404() {
-	$page = $_SERVER['REQUEST_URI'];
 	header('HTTP/1.0 404 Not Found');
-	//TODO exist check
-	include('../errors/404.php');
+	if(!file_exists('../errors/404.php')) {
+		die('404 File not found');
+	}
+	$page = $_SERVER['REQUEST_URI'];
+	require_once('../errors/404.php');
 	die();
 }
 
 function error500() {
 	header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
-	//TODO exist check
-	include('../errors/500.php');
+	if(!file_exists('../errors/500.php')) {
+		die('500 Internal server error');
+	}
+	require_once('../errors/500.php');
 	die();
 }
 
@@ -40,64 +50,82 @@ function noSuchModel($modelFile) {
 	die("There is no such model file: $modelFile");
 }
 
-function snippet($name, $args = array()) {
-	extract($args);
+function noSuchSnippet($snippetFile) {
+	die("There is no such snippet file: $snippetFile");
+}
 
+function noSuchLib($libFile) {
+	die("There is no such library file: $libFile");
+}
+
+function noSuchConf($confFile) {
+	die("There is no such config file: $confFile");
+}
+
+function confError($f, $confFile) {
+	die("Config Error: there is no function $f() defined in $confFile");
+}
+
+function snippet($name, $args = array()) {
+	$snippetFile = "../snippets/$name.php";
+	if(!file_exists($snippetFile)) {
+		$debug = getConfigVar('core', 'debug');
+		if($debug) { noSuchSnippet($snippetFile); }
+		else { error500(); }
+	}
+	extract($args);
 	ob_start();
-	//TODO exist check
-	include("../snippets/$name.php");
+	require_once($snippetFile);
 	return ob_get_clean();
 }
 
 function getConfig($conf) {
-	//TODO exist check
+	$confFile = "../config/$conf.php";
+	if(!file_exists($confFile)) {
+		$debug = getConfigVar('core', 'debug');
+		if($debug) { noSuchConf($confFile); }
+		else { error500(); }
+	}
 	require_once("../config/$conf.php");
+	if(!function_exists($conf)) {
+		$debug = getConfigVar('core', 'debug');
+		if($debug) { confError($conf, $confFile); }
+		else { error500(); }
+	}
 	return $conf();
 }
 
+function getConfigVar($conf, $k) {
+	$a = getConfig($conf);
+	return assocFallback($a, $k, null);
+}
+
 function useLib($lib) {
-	//TODO exist check
+	$libFile = "../lib/$lib.php";
+	if(!file_exists($libFile)) {
+		$debug = getConfigVar('core', 'debug');
+		if($debug) { noSuchLib($libFile); }
+		else { error500(); }
+	}
 	require_once("../lib/$lib.php");
 }
 
 function useModel($model) {
 	$modelFile = "../models/$model.php";
 	if(!file_exists($modelFile)) {
-		if(DEBUG) { noSuchModel($modelFile); }
+		$debug = getConfigVar('core', 'debug');
+		if($debug) { noSuchModel($modelFile); }
 		else { error500(); }
 	}
 	require_once($modelFile);
 }
 
-function redirect($url) {
-	header("Location: $url");
-}
-
-function isPost() {
-	return $_SERVER['REQUEST_METHOD'] === 'POST';
-}
-
-function isGet() {
-	return $_SERVER['REQUEST_METHOD'] === 'GET';
-}
-
-function post($x, $fallback = null) {
-	return isset($_POST[$x])
-		? $_POST[$x]
-		: $fallback;
-}
-
-function get($x, $fallback = null) {
-	return isset($_GET[$x])
-		? $_GET[$x]
-		: $fallback;
-}
-
-function files($x, $fallback = array()) {
-	return isset($_FILES[$x])
-		? $_FILES[$x]
-		: $fallback;
-}
+function redirect($url) { header("Location: $url"); }
+function isPost() { return $_SERVER['REQUEST_METHOD'] === 'POST'; }
+function isGet() { return $_SERVER['REQUEST_METHOD'] === 'GET'; }
+function post($k, $f = null) { return assocFallback($_POST, $k, $f); }
+function get($k, $f = null) { return assocFallback($_GET, $k, $f); }
+function files($k, $f = array()) { return assocFallback($_FILES, $k, $f); }
 
 function checkUploadedFile($file) {
 	switch($file['error']) {
