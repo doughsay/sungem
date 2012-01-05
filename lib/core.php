@@ -49,20 +49,12 @@ function snippet($name, $args = array()) {
 	return ob_get_clean();
 }
 
-function lib($lib) {
+function useLib($lib) {
 	//TODO exist check
 	require_once("../lib/$lib.php");
 }
 
-function initDb() {
-	require_once('../config/db.php');
-	return new PDO(DSN, USERNAME, PASSWORD, array(
-		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-	));
-}
-
-function loadModel($model) {
+function useModel($model) {
 	$modelFile = "../models/$model.php";
 	if(!file_exists($modelFile)) {
 		if(DEBUG) { noSuchModel($modelFile); }

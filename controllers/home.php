@@ -1,12 +1,14 @@
 <?php
-// you can specify a global layout here but it defaults to 'html'
+// define libs and models used up here
+useModel('strings');
+// you can specify a global layout for this controller here
+// but it defaults to 'html'
 $layout = 'html';
 
 function index() {
 	// do stuff here
 
 	// get some stuff from a database
-	loadModel('strings');
 	$strings = getStrings();
 
 	// return variables to the view

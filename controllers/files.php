@@ -1,9 +1,13 @@
 <?php
-lib('auth_digest');
+// a simple file downloader in which you can add extra layers,
+// for example, authentication requirements or tracking.
 
 function download() {
 	$args = func_get_args();
 	$file = '../data/'.implode('/', $args);
+
+	// check to see if user is logged in here, or add some download tracking
+	// info to the db.
 
 	if(!file_exists($file)) {
 		if(DEBUG) {

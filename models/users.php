@@ -1,4 +1,5 @@
 <?php
+useLib('mysql');
 
 function validUser($username, $password) {
 	$saltedPassword = sha1(SALT . $password);

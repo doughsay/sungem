@@ -1,7 +1,7 @@
 <?php
 
 require('../config/core.php');
-require('../lib/helper_functions.php');
+require('../lib/core.php');
 
 if(DEBUG) {
 	error_reporting(E_ALL & ~E_NOTICE);
