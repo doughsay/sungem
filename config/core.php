@@ -1,10 +1,18 @@
 <?php
 
-define('ROOT', '/');
-define('HTTP_ROOT', 'http://dkml.local/');
 define('DEBUG', true);
-define('DEFAULT_CONTROLLER', 'home');
-define('DEFAULT_ACTION', 'index');
-define('DEFAULT_LAYOUT', 'default');
+
+define('ROOT', '/');
+define('HTTP_ROOT', 'http://simplemvc.local/');
+define('TITLE', 'Simple MVC Framework');
+define('TITLE_SEPARATOR', ' - ');
+
+define('SALT', 'supersecretsalt');
+
+$defaultController = 'home';
+$defaultAction = 'index';
+$defaultLayout = 'html';
+
+$areas = array('admin');
 
 ?>

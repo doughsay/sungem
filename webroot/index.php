@@ -16,10 +16,24 @@ else {
 	$args = array();
 }
 
+// default area is nothing
+$area = '';
+
+if(count($args) >= 1 && in_array($args[0], $areas)) {
+	$area = array_shift($args);
+	$areaPath = $area . '/';
+}
+
+// include area config, could override core config
+if($area !== '') {
+	require("../config/$area.php");
+}
+
 // some defaults
-$controller = DEFAULT_CONTROLLER;
-$action = DEFAULT_ACTION;
-$layout = DEFAULT_LAYOUT;
+$controller = $defaultController;
+$action = $defaultAction;
+$layout = $defaultLayout;
+$skipView = false;
 
 if(count($args) >= 1) {
 	$controller = array_shift($args);
@@ -32,7 +46,7 @@ if(count($args) >= 1) {
 // default view is based on the action
 $view = $action;
 
-$controllerFile = "../controllers/$controller.php";
+$controllerFile = "../controllers/$areaPath$controller.php";
 if(!file_exists($controllerFile)) {
 	if(DEBUG) { noSuchController($controllerFile); }
 	else { error404(); }
@@ -52,10 +66,10 @@ if(is_array($vars)) {
 	extract($vars);
 }
 
-$viewFile = "../views/$controller/$view.php";
+$viewFile = "../views/$areaPath$controller/$view.php";
 $layoutFile = "../layouts/$layout.php";
 
-if(!file_exists($viewFile)) {
+if(!$skipView && !file_exists($viewFile)) {
 	if(DEBUG) { noSuchView($viewFile); }
 	else { error404(); }
 }
@@ -65,8 +79,10 @@ if(!file_exists($layoutFile)) {
 }
 
 ob_start();
-include($viewFile);
-$content = ob_get_clean();
+if(!$skipView) {
+	include($viewFile);
+	$content = ob_get_clean();
+}
 include($layoutFile);
 
 ?>
