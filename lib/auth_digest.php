@@ -1,5 +1,4 @@
 <?php
-
 function loginHeaders($realm, $nonce, $cancel = 'You are not authorized.') {
 	header(
 		'WWW-Authenticate: Digest realm="'.$realm
@@ -37,7 +36,7 @@ function parseDigest($txt) {
 		'uri' => 1,
 		'response' => 1
 	);
-	
+
 	$data = array();
 	$keys = implode('|', array_keys($needed_parts));
 

@@ -73,6 +73,7 @@ function snippet($name, $args = array()) {
 		if($debug) { noSuchSnippet($snippetFile); }
 		else { error500(); }
 	}
+	extract(getConfig('core'));
 	extract($args);
 	ob_start();
 	require_once($snippetFile);
