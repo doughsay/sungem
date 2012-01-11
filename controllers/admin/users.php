@@ -37,6 +37,7 @@ function login() {
 function logout() {
 	destroySession();
 	redirect('/admin/users/login/');
+	die();
 }
 
 ?>
