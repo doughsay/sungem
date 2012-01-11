@@ -17,7 +17,7 @@ function validUser($username, $password) {
 		':password' => $saltedPassword
 	);
 
-	$user = fetch($query, $params);
+	$user = mysql\fetch($query, $params);
 	return $user['valid'] == '1';
 }
 ?>

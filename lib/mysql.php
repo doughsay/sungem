@@ -1,10 +1,12 @@
 <?php
-function initDb() {
+namespace mysql;
+
+function init() {
 	if(!isset($GLOBALS['mysql'])) {
 		extract(getConfig('db_mysql'));
-		$GLOBALS['mysql'] =  new PDO($dsn, $username, $password, array(
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+		$GLOBALS['mysql'] =  new \PDO($dsn, $username, $password, array(
+			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
 		));
 	}
 
@@ -36,8 +38,13 @@ function update($query, $params) {
 	return $st->rowCount();
 }
 
+function delete($query, $params) {
+	$st = query($query, $params);
+	return $st->rowCount();
+}
+
 function prepare($query) {
-	$db = initDb();
+	$db = init();
 	return $db->prepare($query);
 }
 
