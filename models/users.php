@@ -5,19 +5,19 @@ function validUser($username, $password) {
 	$salt = getConfigVar('security', 'salt');
 	$saltedPassword = sha1($salt . $password);
 
-	$db = initDb();
-	$st = $db->prepare("
+	$query = "
 		SELECT COUNT(*) AS valid
 		FROM users
 		WHERE username = :username
 			AND password = :password
-	");
-	$st->execute(array(
+	";
+
+	$params = array(
 		':username' => $username,
 		':password' => $saltedPassword
-	));
-	$user = $st->fetch();
+	);
+
+	$user = fetch($query, $params);
 	return $user['valid'] == '1';
 }
-
 ?>
