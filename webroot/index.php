@@ -18,7 +18,7 @@ else {
 // default area is nothing
 $area = '';
 
-if(count($args) >= 1 && in_array($args[0], $areas)) {
+if(isset($areas) && count($args) >= 1 && in_array($args[0], $areas)) {
 	$area = array_shift($args);
 	$areaPath = $area . '/';
 }
