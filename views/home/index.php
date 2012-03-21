@@ -21,8 +21,10 @@
 </ul>
 
 <ul>
-	<li><a href='page1'>Static page1</li>
+	<li><a href='/page'>simple route to page1</li>
+	<li><a href='/pages/page1'>Regex route to page 1</li>
+	<li><a href='/pages/page2'>Regex route to page 2</li>
 	<li><a href='/pages/show/page2'>Static page2</li>
-	<li><a href='/home/some_json'>Some JSON data</li>
+	<li><a href='/json'>Some JSON data</li>
 	<li><a href='/admin'>Admin login</li>
 </ul>

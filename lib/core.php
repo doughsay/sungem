@@ -69,6 +69,7 @@ function confError($f, $confFile) {
 function parseRequest() {
 	extract(getConfig('core'));
 	$routes = getConfig('routes');
+	$regexRoutes = getConfig('regexRoutes');
 
 	$args = array();
 	$url = '';
@@ -80,8 +81,29 @@ function parseRequest() {
 		$url = $_GET['url'];
 	}
 
+	// let's see if we can find a route matching the URL
+	$matchedRoute = null;
+
+	// check simple routes first
 	if(in_array($url, array_keys($routes))) {
-		$route = $routes[$url];
+		$matchedRoute = $routes[$url];
+	}
+
+	// then check regex routes if no simple route was found
+	if($matchedRoute == null) {
+		foreach($regexRoutes as $pattern => $route) {
+			$num = preg_match($pattern, $url, $matches);
+			if($num > 0) {
+				array_shift($matches);
+				$route['args'] = $matches;
+				$matchedRoute = $route;
+				break;
+			}
+		}
+	}
+
+	if($matchedRoute != null) {
+		$route = $matchedRoute;
 
 		// if area is defined in the route, lets get its config (could override core config)
 		if(isset($route['area'])) {
