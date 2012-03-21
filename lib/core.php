@@ -66,6 +66,68 @@ function confError($f, $confFile) {
 	die("Config Error: there is no function $f() defined in $confFile");
 }
 
+function parseRequest() {
+	extract(getConfig('core'));
+	$routes = getConfig('routes');
+
+	$args = array();
+	$url = '';
+
+	// default area is nothing
+	$area = '';
+
+	if(isset($_GET['url'])) {
+		$url = $_GET['url'];
+	}
+
+	if(in_array($url, array_keys($routes))) {
+		$route = $routes[$url];
+
+		// if area is defined in the route, lets get its config (could override core config)
+		if(isset($route['area'])) {
+			$area = $route['area'];
+			extract(getConfig($area));
+		}
+
+		// some defaults
+		$controller = $defaultController;
+		$action = $defaultAction;
+		$layout = $defaultLayout;
+
+		// now we extract the route which could (and should) override at least one of the vars above
+		extract($route);
+	}
+	else {
+		$args = explode('/', $url);
+		if($args[count($args)-1] == '') { array_pop($args); }
+
+		if(isset($areas) && count($args) >= 1 && in_array($args[0], $areas)) {
+			$area = array_shift($args);
+		}
+
+		// include area config, could override core config
+		if($area !== '') {
+			extract(getConfig($area));
+		}
+
+		// some defaults
+		$controller = $defaultController;
+		$action = $defaultAction;
+		$layout = $defaultLayout;
+
+		// if they are specified by the args, get controller and action
+		if(count($args) >= 1) {
+			$controller = array_shift($args);
+		}
+
+		if(count($args) >= 1) {
+			$action = array_shift($args);
+		}
+	}
+
+	return array($area, $controller, $action, $layout, $args);
+}
+
 function snippet($name, $args = array()) {
 	$snippetFile = "../snippets/$name.php";
 	if(!file_exists($snippetFile)) {

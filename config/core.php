@@ -3,7 +3,7 @@ function core() {
 	return array(
 		'debug' => true,
 		'root' => '/',
-		'httpRoot' => 'http://simplemvc.local/',
+		'httpRoot' => 'http://simplemvc.dev/',
 		'title' => 'SimpleMVC',
 		'titleSeparator' => ' - ',
 		'defaultController' => 'home',

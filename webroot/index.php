@@ -7,40 +7,19 @@ if($debug) {
 	ini_set("display_errors", 1);
 }
 
-if(isset($_GET['url'])) {
-	$args = explode('/', $_GET['url']);
-	if($args[count($args)-1] == '') { array_pop($args); }
-}
-else {
-	$args = array();
-}
+list($area, $controller, $action, $layout, $args) = parseRequest();
 
-// default area is nothing
-$area = '';
-
-if(isset($areas) && count($args) >= 1 && in_array($args[0], $areas)) {
-	$area = array_shift($args);
-	$areaPath = $area . '/';
-}
+// no area by default
+$areaPath = '';
 
 // include area config, could override core config
 if($area !== '') {
 	extract(getConfig($area));
+	$areaPath = $area . '/';
 }
 
-// some defaults
-$controller = $defaultController;
-$action = $defaultAction;
-$layout = $defaultLayout;
+// by default, we don't skip views
 $skipView = false;
-
-if(count($args) >= 1) {
-	$controller = array_shift($args);
-}
-
-if(count($args) >= 1) {
-	$action = array_shift($args);
-}
 
 // default view is based on the action
 $view = $action;
