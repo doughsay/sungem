@@ -76,24 +76,28 @@ function snippet($name, $args = array()) {
 	extract(getConfig('core'));
 	extract($args);
 	ob_start();
-	require_once($snippetFile);
+	require($snippetFile);
 	return ob_get_clean();
 }
 
 function getConfig($conf) {
-	$confFile = "../config/$conf.php";
-	if(!file_exists($confFile)) {
-		$debug = getConfigVar('core', 'debug');
-		if($debug) { noSuchConf($confFile); }
-		else { error500(); }
+	if(!isset($GLOBALS['configMemo'][$conf])) {
+		$confFile = "../config/$conf.php";
+		if(!file_exists($confFile)) {
+			$debug = getConfigVar('core', 'debug');
+			if($debug) { noSuchConf($confFile); }
+			else { error500(); }
+		}
+		require_once("../config/$conf.php");
+		if(!function_exists($conf)) {
+			$debug = getConfigVar('core', 'debug');
+			if($debug) { confError($conf, $confFile); }
+			else { error500(); }
+		}
+		$config = $conf();
+		$GLOBALS['configMemo'][$conf] = $config;
 	}
-	require_once("../config/$conf.php");
-	if(!function_exists($conf)) {
-		$debug = getConfigVar('core', 'debug');
-		if($debug) { confError($conf, $confFile); }
-		else { error500(); }
-	}
-	return $conf();
+	return $GLOBALS['configMemo'][$conf];
 }
 
 function getConfigVar($conf, $k) {
@@ -102,23 +106,29 @@ function getConfigVar($conf, $k) {
 }
 
 function useLib($lib) {
-	$libFile = "../lib/$lib.php";
-	if(!file_exists($libFile)) {
-		$debug = getConfigVar('core', 'debug');
-		if($debug) { noSuchLib($libFile); }
-		else { error500(); }
+	if(!$GLOBALS['libMemo'][$lib]) {
+		$libFile = "../lib/$lib.php";
+		if(!file_exists($libFile)) {
+			$debug = getConfigVar('core', 'debug');
+			if($debug) { noSuchLib($libFile); }
+			else { error500(); }
+		}
+		require_once("../lib/$lib.php");
+		$GLOBALS['libMemo'][$lib] = true;
 	}
-	require_once("../lib/$lib.php");
 }
 
 function useModel($model) {
-	$modelFile = "../models/$model.php";
-	if(!file_exists($modelFile)) {
-		$debug = getConfigVar('core', 'debug');
-		if($debug) { noSuchModel($modelFile); }
-		else { error500(); }
+	if(!$GLOBALS['modelMemo'][$model]) {
+		$modelFile = "../models/$model.php";
+		if(!file_exists($modelFile)) {
+			$debug = getConfigVar('core', 'debug');
+			if($debug) { noSuchModel($modelFile); }
+			else { error500(); }
+		}
+		require_once($modelFile);
+		$GLOBALS['modelMemo'][$model] = true;
 	}
-	require_once($modelFile);
 }
 
 function redirect($url) { header("Location: $url"); }
