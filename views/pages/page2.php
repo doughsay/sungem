@@ -1,0 +1,1 @@
+<p>Just a static page2</p>
