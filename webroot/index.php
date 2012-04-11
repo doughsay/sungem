@@ -43,10 +43,10 @@ require_once($controllerFile);
 
 // check if the requested action has a corresponding function
 if(!function_exists($action)) {
-	if(function_exists('_')) {
+	if(function_exists('_default')) {
 		// function did not exist, but a catch all was defined
 		array_unshift($args, $action);
-		$action = '_';
+		$action = '_default';
 	}
 	else {
 		// no function to call was found
