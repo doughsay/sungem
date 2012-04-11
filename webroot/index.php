@@ -1,10 +1,18 @@
 <?php
+define('ROOT', dirname(dirname(__FILE__)));
+
 require('../lib/core.php');
 extract(getConfig('core'));
 
 if($debug) {
-	error_reporting(E_ALL & ~E_NOTICE);
-	ini_set("display_errors", 1);
+	error_reporting(E_ALL);
+	ini_set('display_errors', 'On');
+}
+else {
+	error_reporting(E_ALL);
+	ini_set('display_errors', 'Off');
+	ini_set('log_errors', 'On');
+	ini_set('error_log', ROOT . '/logs/error.log');
 }
 
 list($area, $controller, $action, $layout, $args) = parseRequest();

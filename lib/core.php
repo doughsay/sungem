@@ -190,7 +190,7 @@ function getConfigVar($conf, $k) {
 }
 
 function useLib($lib) {
-	if(!$GLOBALS['libMemo'][$lib]) {
+	if(!isset($GLOBALS['libMemo'][$lib])) {
 		$libFile = "../lib/$lib.php";
 		if(!file_exists($libFile)) {
 			$debug = getConfigVar('core', 'debug');
@@ -203,7 +203,7 @@ function useLib($lib) {
 }
 
 function useModel($model) {
-	if(!$GLOBALS['modelMemo'][$model]) {
+	if(!isset($GLOBALS['modelMemo'][$model])) {
 		$modelFile = "../models/$model.php";
 		if(!file_exists($modelFile)) {
 			$debug = getConfigVar('core', 'debug');
