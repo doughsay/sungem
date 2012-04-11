@@ -41,9 +41,18 @@ if(!file_exists($controllerFile)) {
 // include the controller, this can overwrite variables defined so far
 require_once($controllerFile);
 
+// check if the requested action has a corresponding function
 if(!function_exists($action)) {
-	if($debug) { noSuchAction($action, $controllerFile); }
-	else { error404(); }
+	if(function_exists('_')) {
+		// function did not exist, but a catch all was defined
+		array_unshift($args, $action);
+		$action = '_';
+	}
+	else {
+		// no function to call was found
+		if($debug) { noSuchAction($action, $controllerFile); }
+		else { error404(); }
+	}
 }
 
 // call the action, this can overwrite many of the variables defined so far
