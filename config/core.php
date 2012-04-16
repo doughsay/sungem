@@ -2,9 +2,7 @@
 function core() {
 	return array(
 		'debug' => true,
-		'root' => '/',
-		'httpRoot' => 'http://simplemvc.dev/',
-		'title' => 'SimpleMVC',
+		'title' => 'Sungem',
 		'titleSeparator' => ' - ',
 		'defaultController' => 'home',
 		'defaultAction' => 'index',
