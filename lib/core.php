@@ -68,8 +68,8 @@ function confError($f, $confFile) {
 
 function parseRequest() {
 	extract(getConfig('core'));
-	$routes = getConfig('routes');
-	$regexRoutes = getConfig('regexRoutes');
+	$routes = getMaybeConfig('routes');
+	$regexRoutes = getMaybeConfig('regexRoutes');
 
 	$args = array();
 	$url = '';
@@ -171,6 +171,24 @@ function getConfig($conf) {
 			$debug = getConfigVar('core', 'debug');
 			if($debug) { noSuchConf($confFile); }
 			else { error500(); }
+		}
+		require_once("../config/$conf.php");
+		if(!function_exists($conf)) {
+			$debug = getConfigVar('core', 'debug');
+			if($debug) { confError($conf, $confFile); }
+			else { error500(); }
+		}
+		$config = $conf();
+		$GLOBALS['configMemo'][$conf] = $config;
+	}
+	return $GLOBALS['configMemo'][$conf];
+}
+
+function getMaybeConfig($conf) {
+	if(!isset($GLOBALS['configMemo'][$conf])) {
+		$confFile = "../config/$conf.php";
+		if(!file_exists($confFile)) {
+			return array();
 		}
 		require_once("../config/$conf.php");
 		if(!function_exists($conf)) {
