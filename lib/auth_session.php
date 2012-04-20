@@ -1,4 +1,5 @@
 <?php
+namespace auth_session;
 session_start();
 
 function requireLogin($redirectUrl) {
@@ -19,4 +20,3 @@ function destroySession() {
 	$_SESSION = array();
 	session_destroy();
 }
-?>

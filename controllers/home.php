@@ -1,36 +1,76 @@
 <?php
-// define libs and models used up here
 useModel('strings');
-// you can specify a global layout for this controller here
-// but it defaults to 'html'
-$layout = 'html';
 
-function index() {
-	// do stuff here
+$html = layout('html');
 
-	// get some stuff from a database
-	$strings = getStrings();
+get('/', function() use ($html) {
 
-	// return variables to the view
-	return array(
-		'pageTitle' => 'Home!',
-		'foo' => 'This is foo!',
-		'bar' => 'And bar!',
-		'strings' => $strings,
-		'view' => 'index', // you can specify the view, but it defaults to the
-		                   // name of the action
-		'layout' => 'html' // you can also specify the layout here
+	$strings = strings\getStrings();
+
+	$index = view('home/index');
+
+	return $html(
+		'Home',
+		$index('This is foo!', 'And bar!', $strings)
 	);
-}
+});
 
-function some_json() {
-	return array(
-		'layout' => 'json',
-		'skipView' => true, // you can also skip the view entirely, useful for
-		'content' => array( // json sometimes, but a complex json object should
-			'foo' => 'bar', // probably be built from raw data in a view.
-			'baz' => 3.14159
+get('/get_example/:foo/:bar', function($foo, $bar) use ($html) {
+
+	$page = view('home/get_example');
+
+	return $html(
+		'GET example',
+		$page($foo, $bar)
+	);
+});
+
+get('/post_example', function() use ($html) {
+
+	$page = view('home/post_example');
+
+	return $html(
+		'POST example',
+		$page()
+	);
+});
+
+post('/post_example', function() use ($html) {
+
+	$page = view('home/post_example_post');
+	$foo = postVar('foo');
+	$bar = postVar('bar');
+
+	return $html(
+		'POST example',
+		$page($foo, $bar)
+	);
+});
+
+get('/json', function() {
+
+	$data = array(
+		'folder1' => array(
+			'file1',
+			'file2',
+			'file3'
+		),
+		'folder2' => array(
+			'folder3' => array(
+				'file4',
+				'file5'
+			)
 		)
 	);
-}
-?>
+
+	$json = layout('json');
+
+	return $json($data);
+});
+
+get('/readme', function() use ($html) {
+
+	useLib('markdown/markdown');
+	return $html('Readme', Markdown(file_get_contents('../data/README.md')));
+
+});

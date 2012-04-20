@@ -1,45 +1,44 @@
--- Example database for Sungem sample app
-
 --
--- Database: `test`
+-- Database: 'sungem'
 --
-CREATE DATABASE `test` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-USE `test`;
+CREATE DATABASE sungem DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+USE sungem;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `some_strings`
+-- Table structure for table 'some_strings'
 --
 
-CREATE TABLE IF NOT EXISTS `some_strings` (
-  `string` varchar(255) NOT NULL
+CREATE TABLE some_strings (
+  `string` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `some_strings`
+-- Dumping data for table 'some_strings'
 --
 
-INSERT INTO `some_strings` (`string`) VALUES
-('foo'),
-('bar');
+INSERT INTO some_strings (`string`) VALUES
+('Foo'),
+('Bar'),
+('Baz');
+
+-- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Table structure for table 'users'
 --
 
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+CREATE TABLE users (
+  username varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password` char(40) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+  PRIMARY KEY (username)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `users`
+-- Dumping data for table 'users'
 --
 
--- NOTE:  Passwords are the salt concatenated with the password
-
-INSERT INTO `users` (`id`, `username`, `password`) VALUES
-(1, 'admin', SHA1('supersecretsalt-password'));
+-- NOTE: password for users is sha1 hash of salt prepended to the password
+INSERT INTO users (username, `password`) VALUES
+('admin', 'supersecretsalt-p@ssw0rd');

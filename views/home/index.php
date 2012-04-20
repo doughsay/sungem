@@ -1,12 +1,14 @@
-<?php $pageTitle = "Home sweet home"; // You can override any variables used in the layout ?>
-
+<?php $index = function($foo, $bar, $strings) { ?>
 <p>This is some static content.</p>
 
 <p><?php echo $foo; ?></p>
 
 <p><?php echo $bar; ?></p>
 
-<p><?php echo snippet('baz', array('baz' => 'And this is baz!')); ?>
+<?php
+	$baz = partial('baz');
+	echo $baz('And this is baz!');
+?>
 
 <p>
 	Strings from the database:
@@ -21,10 +23,13 @@
 </ul>
 
 <ul>
-	<li><a href='/page'>simple route to page1</li>
-	<li><a href='/pages/page1'>Regex route to page 1</li>
-	<li><a href='/pages/page2'>Regex route to page 2</li>
-	<li><a href='/pages/show/page2'>Static page2</li>
-	<li><a href='/json'>Some JSON data</li>
-	<li><a href='/admin'>Admin login</li>
+	<li><a href='/readme'>Sungem README</a></li>
+	<li><a href='/download/README.md'>download the README</a></li>
+	<li><a href='/pages/page1'>simple page 1</a></li>
+	<li><a href='/pages/page2'>simple page 2</a></li>
+	<li><a href='/get_example/var-one/var-two'>url parameter example</a></li>
+	<li><a href='/post_example'>form post example</a></li>
+	<li><a href='/json'>Some JSON data</a></li>
+	<li><a href='/admin'>Admin login</a></li>
 </ul>
+<?php }; ?>

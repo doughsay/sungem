@@ -1,3 +1,4 @@
+<?php $login = function($error) { ?>
 <div id='Login' class='center'>
 	<?php if($error): ?>
 		<p class='error center'>Invalid username or password.</p>
@@ -16,3 +17,4 @@
 		</p>
 	</form>
 </div>
+<?php } ?>

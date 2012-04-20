@@ -4,4 +4,3 @@ function security() {
 		'salt' => 'supersecretsalt-'
 	);
 }
-?>

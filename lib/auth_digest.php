@@ -1,4 +1,6 @@
 <?php
+namespace auth_digest;
+
 function loginHeaders($realm, $nonce, $cancel = 'You are not authorized.') {
 	header(
 		'WWW-Authenticate: Digest realm="'.$realm
@@ -85,5 +87,3 @@ function requireLogin($realm, $validUser, $passForUser) {
 		loginHeaders($realm, $nonce);
 	}
 }
-
-?>

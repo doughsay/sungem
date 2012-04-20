@@ -2,42 +2,39 @@
 useLib('auth_session');
 useModel('users');
 
-function index() {
-	requireLogin('/admin/users/login/');
+$html = layout('html');
+
+get('/admin', function() use ($html) {
+	auth_session\requireLogin('/admin/users/login/');
 
 	$username = $_SESSION['admin_user'];
-	return array(
-		'pageTitle' => 'Admin Section',
-		'username' => $username
-	);
-}
+	$page = view('admin/users/index');
 
-function login() {
+	return $html('Admin Section', $page($username));
+});
 
-	$error = false;
-	if(isPost()) {
-		$username = post('username');
-		$password = post('password');
-		if(validUser($username, $password)) {
-			createSession($username);
-			redirect('/admin/');
-		}
-		else {
-			$error = true;
-		}
+get('/admin/users/login', function() use ($html) {
+
+	$login = view('admin/users/login');
+	$error = getVar('error', '0') === '1' ? true : false;
+
+	return $html('Login', $login($error));
+});
+
+post('/admin/users/login', function() {
+	$username = postVar('username');
+	$password = postVar('password');
+	if(users\validUser($username, $password)) {
+		auth_session\createSession($username);
+		redirect('/admin');
 	}
+	else {
+		redirect('/admin/users/login?error=1');
+	}
+});
 
-	return array(
-		'pageTitle' => 'Login',
-		'css' => array('admin'),
-		'error' => $error
-	);
-}
-
-function logout() {
-	destroySession();
+get('/admin/users/logout', function() {
+	auth_session\destroySession();
 	redirect('/admin/users/login/');
 	die();
-}
-
-?>
+});

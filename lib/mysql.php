@@ -53,4 +53,3 @@ function query($query, $params = array()) {
 	$st->execute($params);
 	return $st;
 }
-?>
