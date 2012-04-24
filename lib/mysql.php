@@ -43,6 +43,11 @@ function delete($query, $params) {
 	return $st->rowCount();
 }
 
+function rowCount($query, $params = array()) {
+	$st = query($query, $params);
+	return $st->rowCount();
+}
+
 function prepare($query) {
 	$db = init();
 	return $db->prepare($query);

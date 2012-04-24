@@ -2,7 +2,7 @@
 define('ROOT', dirname(dirname(__FILE__)));
 
 require('../lib/core.php');
-extract(getMaybeConfig('core'));
+extract(getConfig('core'));
 if(!isset($debug)) { $debug = true; }
 
 if($debug) {

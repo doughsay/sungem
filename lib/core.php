@@ -54,8 +54,8 @@ function noSuchConf($confFile) {
 	die("There is no such config file: $confFile");
 }
 
-function confError($f, $confFile) {
-	die("Config Error: there is no function $f() defined in $confFile");
+function confError($v, $confFile) {
+	die("Config Error: there is no variable $$v defined in $confFile");
 }
 
 function getConfig($conf) {
@@ -67,37 +67,20 @@ function getConfig($conf) {
 			else { error500(); }
 		}
 		require_once("../config/$conf.php");
-		if(!function_exists($conf)) {
+		$pieces = explode('/', $conf);
+		$confName = array_pop($pieces);
+		if(!isset(${$confName})) {
 			$debug = getConfigVar('core', 'debug', true);
-			if($debug) { confError($conf, $confFile); }
+			if($debug) { confError($confName, $confFile); }
 			else { error500(); }
 		}
-		$config = $conf();
-		$GLOBALS['configMemo'][$conf] = $config;
-	}
-	return $GLOBALS['configMemo'][$conf];
-}
-
-function getMaybeConfig($conf) {
-	if(!isset($GLOBALS['configMemo'][$conf])) {
-		$confFile = "../config/$conf.php";
-		if(!file_exists($confFile)) {
-			return array();
-		}
-		require_once("../config/$conf.php");
-		if(!function_exists($conf)) {
-			$debug = getConfigVar('core', 'debug', true);
-			if($debug) { confError($conf, $confFile); }
-			else { error500(); }
-		}
-		$config = $conf();
-		$GLOBALS['configMemo'][$conf] = $config;
+		$GLOBALS['configMemo'][$conf] = ${$confName};
 	}
 	return $GLOBALS['configMemo'][$conf];
 }
 
 function getConfigVar($conf, $k, $fallback = null) {
-	$a = getMaybeConfig($conf);
+	$a = getConfig($conf);
 	return assocFallback($a, $k, $fallback);
 }
 
@@ -228,7 +211,7 @@ function ls($dir, $recursive = false, $extension = null, $prepend = '') {
 			if ($entry != "." && $entry != "..") {
 
 				if($recursive && is_dir($dir . '/' . $entry)) {
-					$recursedContents = ls($dir . '/' . $entry, true, $extension, $entry . '/');
+					$recursedContents = ls($dir . '/' . $entry, true, $extension, $prepend . $entry . '/');
 					$contents = array_merge($contents, $recursedContents);
 				}
 				else {
