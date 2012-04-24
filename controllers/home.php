@@ -1,13 +1,14 @@
 <?php
 useModel('strings');
+useLib('markdown_view');
 
-$html = layout('html');
+$html = phpView('layouts/html');
 
 get('/', function() use ($html) {
 
 	$strings = strings\getStrings();
 
-	$index = view('home/index');
+	$index = phpView('home/index');
 
 	return $html(
 		'Home',
@@ -17,7 +18,7 @@ get('/', function() use ($html) {
 
 get('/get_example/:foo/:bar', function($foo, $bar) use ($html) {
 
-	$page = view('home/get_example');
+	$page = phpView('home/get_example');
 
 	return $html(
 		'GET example',
@@ -27,7 +28,7 @@ get('/get_example/:foo/:bar', function($foo, $bar) use ($html) {
 
 get('/post_example', function() use ($html) {
 
-	$page = view('home/post_example');
+	$page = phpView('home/post_example');
 
 	return $html(
 		'POST example',
@@ -37,7 +38,7 @@ get('/post_example', function() use ($html) {
 
 post('/post_example', function() use ($html) {
 
-	$page = view('home/post_example_post');
+	$page = phpView('home/post_example_post');
 	$foo = postVar('foo');
 	$bar = postVar('bar');
 
@@ -63,14 +64,14 @@ get('/json', function() {
 		)
 	);
 
-	$json = layout('json');
+	$json = phpView('layouts/json');
 
 	return $json($data);
 });
 
 get('/readme', function() use ($html) {
 
-	useLib('markdown/markdown');
-	return $html('Readme', Markdown(file_get_contents('../data/README.md')));
+	$readme = mdView('home/README');
+	return $html('Readme', $readme());
 
 });

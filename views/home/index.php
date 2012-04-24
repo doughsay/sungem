@@ -6,8 +6,9 @@
 <p><?php echo $bar; ?></p>
 
 <?php
-	$baz = partial('baz');
+	$baz = phpView('partials/baz');
 	echo $baz('And this is baz!');
+	echo $baz('This is a second call to baz!');
 ?>
 
 <p>

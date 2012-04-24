@@ -1,6 +1,6 @@
 <?php
 
-$html = layout('html');
+$html = phpView('layouts/html');
 
 get('/pages/:page', function($page) use ($html) {
 	$titles = array(
@@ -8,13 +8,13 @@ get('/pages/:page', function($page) use ($html) {
 		'page2' => 'Simple Page 2'
 	);
 
-	if(!file_exists('../views/pages/'.$page.'.php')) {
+	if(!file_exists('../views/pages/'.$page.'.html')) {
 		$debug = getConfigVar('core', 'debug', true);
 		if($debug) { noSuchView('../views/pages/'.$page); }
 		else { error404(); }
 	}
 
 	$title = $titles[$page];
-	$page = view('pages/'.$page);
+	$page = htmlView('pages/'.$page);
 	return $html($title, $page());
 });

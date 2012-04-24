@@ -38,6 +38,10 @@ function noSuchView($viewFile) {
 	die("There is no such view file: $viewFile");
 }
 
+function noSuchViewFunction($viewFile, $viewName) {
+	die("There is no closure \"$$viewName\" defined in the view: $viewFile.");
+}
+
 function noSuchModel($modelFile) {
 	die("There is no such model file: $modelFile");
 }
@@ -278,9 +282,41 @@ function post($route, $f) {
 	register('post', $route, $f);
 };
 
-function view($view) {
-	if(!isset($GLOBALS['views'][$view])) {
+function phpView($view) {
+	if(!isset($GLOBALS['views']['php'][$view])) {
 		$viewFile = "../views/$view.php";
+
+		$debug = getConfigVar('core', 'debug', true);
+
+		if(!file_exists($viewFile)) {
+			if($debug) { noSuchView($viewFile); }
+			else { error500(); }
+		}
+
+		require_once($viewFile);
+
+		$pieces = explode('/', $view);
+		$viewName = array_pop($pieces);
+
+		if(!isset(${$viewName})) {
+			if($debug) { noSuchViewFunction($viewFile, $viewName); }
+			else { error500(); }
+		}
+		else {
+			$func = ${$viewName};
+			$GLOBALS['views']['php'][$view] = function() use ($func) {
+				ob_start();
+				call_user_func_array($func, func_get_args());
+				return ob_get_clean();
+			};
+		}
+	}
+	return $GLOBALS['views']['php'][$view];
+}
+
+function htmlView($view) {
+	if(!isset($GLOBALS['views']['html'][$view])) {
+		$viewFile = "../views/$view.html";
 
 		if(!file_exists($viewFile)) {
 			$debug = getConfigVar('core', 'debug', true);
@@ -292,25 +328,9 @@ function view($view) {
 		require_once($viewFile);
 		$c = trim(ob_get_clean());
 
-		$pieces = explode('/', $view);
-		$viewName = array_pop($pieces);
-
-		if(!isset(${$viewName})) {
-			$GLOBALS['views'][$view] = function() use ($c) {
-				return $c;
-			};
-		}
-		else {
-			$func = ${$viewName};
-			$GLOBALS['views'][$view] = function() use ($func) {
-				ob_start();
-				call_user_func_array($func, func_get_args());
-				return ob_get_clean();
-			};
-		}
+		$GLOBALS['views']['html'][$view] = function() use ($c) {
+			return $c;
+		};
 	}
-	return $GLOBALS['views'][$view];
+	return $GLOBALS['views']['html'][$view];
 }
-
-function layout($layout) { return view("layouts/$layout"); }
-function partial($partial) { return view("partials/$partial"); }

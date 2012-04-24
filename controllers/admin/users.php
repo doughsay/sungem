@@ -2,20 +2,20 @@
 useLib('auth_session');
 useModel('users');
 
-$html = layout('html');
+$html = phpView('layouts/html');
 
 get('/admin', function() use ($html) {
 	auth_session\requireLogin('/admin/users/login/');
 
 	$username = $_SESSION['admin_user'];
-	$page = view('admin/users/index');
+	$page = phpView('admin/users/index');
 
 	return $html('Admin Section', $page($username));
 });
 
 get('/admin/users/login', function() use ($html) {
 
-	$login = view('admin/users/login');
+	$login = phpView('admin/users/login');
 	$error = getVar('error', '0') === '1' ? true : false;
 
 	return $html('Login', $login($error));
