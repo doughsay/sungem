@@ -116,6 +116,7 @@ function isGet() { return $_SERVER['REQUEST_METHOD'] === 'GET'; }
 function postVar($k, $f = null) { return assocFallback($_POST, $k, $f); }
 function getVar($k, $f = null) { return assocFallback($_GET, $k, $f); }
 function filesVar($k, $f = array()) { return assocFallback($_FILES, $k, $f); }
+function sessionVar($k, $f = null) { return assocFallback($_SESSION, $k, $f); }
 
 function method() {
 	if(isGet()) {
