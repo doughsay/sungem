@@ -266,6 +266,11 @@ function post($route, $f) {
 	register('post', $route, $f);
 };
 
+function json($a) {
+    header('Content-Type:application/json');
+	return json_encode($a);
+}
+
 function phpView($view) {
 	if(!isset($GLOBALS['views']['php'][$view])) {
 		$viewFile = "../views/$view.php";

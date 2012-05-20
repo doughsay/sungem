@@ -1,7 +1,5 @@
 <?php
-function core() {
-	return array(
-		'debug' => true,
-		'title' => 'Sungem'
-	);
-}
+$core = array(
+	'debug' => true,
+	'title' => 'Sungem'
+);

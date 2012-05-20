@@ -28,7 +28,7 @@ get('/get_example/:foo/:bar', function($foo, $bar) use ($html) {
 
 get('/post_example', function() use ($html) {
 
-	$page = phpView('home/post_example');
+	$page = htmlView('home/post_example');
 
 	return $html(
 		'POST example',
@@ -64,9 +64,7 @@ get('/json', function() {
 		)
 	);
 
-	$json = phpView('layouts/json');
-
-	return $json($data);
+	return json($data);
 });
 
 get('/readme', function() use ($html) {

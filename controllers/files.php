@@ -22,5 +22,5 @@ get('/download/*', function($path) {
 	finfo_close($finfo);
 
 	header("content-type: $mime");
-	die(readfile($file));
+	return readfile($file);
 });

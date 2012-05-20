@@ -1,6 +1,4 @@
 <?php
-function security() {
-	return array(
-		'salt' => 'supersecretsalt-'
-	);
-}
+$security = array(
+	'salt' => 'supersecretsalt-'
+);

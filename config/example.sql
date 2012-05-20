@@ -41,4 +41,4 @@ CREATE TABLE users (
 
 -- NOTE: password for users is sha1 hash of salt prepended to the password
 INSERT INTO users (username, `password`) VALUES
-('admin', 'supersecretsalt-p@ssw0rd');
+('admin', SHA1('supersecretsalt-p@ssw0rd'));
