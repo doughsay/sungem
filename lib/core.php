@@ -5,6 +5,12 @@ function pr($x) {
 	print('</pre>');
 }
 
+function debug() {
+	return isset($GLOBALS['config']['core']['debug'])
+		? $GLOBALS['config']['core']['debug']
+		: true;
+}
+
 function assocFallback($a, $k, $f) {
 	return isset($a[$k])
 		? $a[$k]
@@ -38,10 +44,6 @@ function noSuchView($viewFile) {
 	die("There is no such view file: $viewFile");
 }
 
-function noSuchViewFunction($viewFile, $viewName) {
-	die("There is no closure \"$$viewName\" defined in the view: $viewFile.");
-}
-
 function noSuchModel($modelFile) {
 	die("There is no such model file: $modelFile");
 }
@@ -59,24 +61,22 @@ function confError($v, $confFile) {
 }
 
 function getConfig($conf) {
-	if(!isset($GLOBALS['configMemo'][$conf])) {
+	if(!isset($GLOBALS['config'][$conf])) {
 		$confFile = "../config/$conf.php";
 		if(!file_exists($confFile)) {
-			$debug = getConfigVar('core', 'debug', true);
-			if($debug) { noSuchConf($confFile); }
+			if(debug()) { noSuchConf($confFile); }
 			else { error500(); }
 		}
 		require_once("../config/$conf.php");
 		$pieces = explode('/', $conf);
 		$confName = array_pop($pieces);
 		if(!isset(${$confName})) {
-			$debug = getConfigVar('core', 'debug', true);
-			if($debug) { confError($confName, $confFile); }
+			if(debug()) { confError($confName, $confFile); }
 			else { error500(); }
 		}
-		$GLOBALS['configMemo'][$conf] = ${$confName};
+		$GLOBALS['config'][$conf] = ${$confName};
 	}
-	return $GLOBALS['configMemo'][$conf];
+	return $GLOBALS['config'][$conf];
 }
 
 function getConfigVar($conf, $k, $fallback = null) {
@@ -85,28 +85,26 @@ function getConfigVar($conf, $k, $fallback = null) {
 }
 
 function useLib($lib) {
-	if(!isset($GLOBALS['libMemo'][$lib])) {
+	if(!isset($GLOBALS['lib'][$lib])) {
 		$libFile = "../lib/$lib.php";
 		if(!file_exists($libFile)) {
-			$debug = getConfigVar('core', 'debug', true);
-			if($debug) { noSuchLib($libFile); }
+			if(debug()) { noSuchLib($libFile); }
 			else { error500(); }
 		}
 		require_once("../lib/$lib.php");
-		$GLOBALS['libMemo'][$lib] = true;
+		$GLOBALS['lib'][$lib] = true;
 	}
 }
 
 function useModel($model) {
-	if(!isset($GLOBALS['modelMemo'][$model])) {
+	if(!isset($GLOBALS['model'][$model])) {
 		$modelFile = "../models/$model.php";
 		if(!file_exists($modelFile)) {
-			$debug = getConfigVar('core', 'debug', true);
-			if($debug) { noSuchModel($modelFile); }
+			if(debug()) { noSuchModel($modelFile); }
 			else { error500(); }
 		}
 		require_once($modelFile);
-		$GLOBALS['modelMemo'][$model] = true;
+		$GLOBALS['model'][$model] = true;
 	}
 }
 
@@ -117,6 +115,7 @@ function postVar($k, $f = null) { return assocFallback($_POST, $k, $f); }
 function getVar($k, $f = null) { return assocFallback($_GET, $k, $f); }
 function filesVar($k, $f = array()) { return assocFallback($_FILES, $k, $f); }
 function sessionVar($k, $f = null) { return assocFallback($_SESSION, $k, $f); }
+function url() { return getVar('url', ''); }
 
 function method() {
 	if(isGet()) {
@@ -126,8 +125,7 @@ function method() {
 		return 'post';
 	}
 	else {
-		$debug = getConfigVar('core', 'debug', true);
-		if($debug) { die('un-handled http request method'); }
+		if(debug()) { die('un-handled http request method'); }
 		else { error500(); }
 	}
 }
@@ -235,6 +233,13 @@ function ls($dir, $recursive = false, $extension = null, $prepend = '') {
 	return $contents;
 }
 
+function registerRoutes() {
+	$controllers = ls('../controllers', true, 'php');
+	foreach($controllers as $controller) {
+		require_once("../controllers/$controller");
+	}
+}
+
 function register($method, $route, $f) {
 	$regexify = function($route) {
 		$pieces = explode('/', $route);
@@ -271,55 +276,15 @@ function json($a) {
 	return json_encode($a);
 }
 
-function phpView($view) {
-	if(!isset($GLOBALS['views']['php'][$view])) {
-		$viewFile = "../views/$view.php";
-
-		$debug = getConfigVar('core', 'debug', true);
-
-		if(!file_exists($viewFile)) {
-			if($debug) { noSuchView($viewFile); }
-			else { error500(); }
-		}
-
-		require_once($viewFile);
-
-		$pieces = explode('/', $view);
-		$viewName = array_pop($pieces);
-
-		if(!isset(${$viewName})) {
-			if($debug) { noSuchViewFunction($viewFile, $viewName); }
-			else { error500(); }
-		}
-		else {
-			$func = ${$viewName};
-			$GLOBALS['views']['php'][$view] = function() use ($func) {
-				ob_start();
-				call_user_func_array($func, func_get_args());
-				return ob_get_clean();
-			};
+function dispatch($url) {
+	$routes = $GLOBALS['routes'];
+	foreach($routes[method()] as $pattern => $handler) {
+		if(preg_match($pattern, $url, $matches) === 1) {
+			array_shift($matches);
+			$params = $matches;
+			echo call_user_func_array($handler, $params);
+			pr($GLOBALS);
+			die();
 		}
 	}
-	return $GLOBALS['views']['php'][$view];
-}
-
-function htmlView($view) {
-	if(!isset($GLOBALS['views']['html'][$view])) {
-		$viewFile = "../views/$view.html";
-
-		if(!file_exists($viewFile)) {
-			$debug = getConfigVar('core', 'debug', true);
-			if($debug) { noSuchView($viewFile); }
-			else { error500(); }
-		}
-
-		ob_start();
-		require_once($viewFile);
-		$c = trim(ob_get_clean());
-
-		$GLOBALS['views']['html'][$view] = function() use ($c) {
-			return $c;
-		};
-	}
-	return $GLOBALS['views']['html'][$view];
 }

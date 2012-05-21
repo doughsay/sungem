@@ -1,5 +1,5 @@
 <?php
-namespace auth_digest;
+namespace auth\digest;
 
 function loginHeaders($realm, $nonce, $cancel = 'You are not authorized.') {
 	header(

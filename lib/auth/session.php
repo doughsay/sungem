@@ -1,5 +1,5 @@
 <?php
-namespace auth_session;
+namespace auth\session;
 session_start();
 
 function requireLogin($redirectUrl) {

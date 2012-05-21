@@ -1,5 +1,5 @@
 <?php
-namespace mysql;
+namespace db\mysql;
 
 function init() {
 	if(!isset($GLOBALS['mysql'])) {

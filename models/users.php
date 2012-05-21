@@ -1,6 +1,7 @@
 <?php
 namespace users;
-useLib('mysql');
+useLib('db/mysql');
+use db\mysql;
 
 function validUser($username, $password) {
 	$salt = getConfigVar('security', 'salt');
@@ -18,6 +19,6 @@ function validUser($username, $password) {
 		':password' => $saltedPassword
 	);
 
-	$user = \mysql\fetch($query, $params);
+	$user = mysql\fetch($query, $params);
 	return $user['valid'] == '1';
 }

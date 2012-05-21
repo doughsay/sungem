@@ -1,3 +1,4 @@
+<?php /* 404($page): */ ?>
 <!DOCTYPE html>
 <html>
 	<head>

@@ -9,7 +9,7 @@ get('/download/*', function($path) {
 	// info to the db.
 
 	if(!file_exists($file)) {
-		if(getConfigVar('core', 'debug', true)) {
+		if(debug()) {
 			die('There is no such file');
 		}
 		else {

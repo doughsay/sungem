@@ -1,6 +1,6 @@
 <?php
-	$html = function($pageTitle, $content, $json = null, $js = null, $css = null) {
-		$title = getConfigVar('core', 'title');
+$title = getConfigVar('core', 'title');
+/* html($pageTitle, $content, $js, $css): */
 ?>
 <!DOCTYPE html>
 <html>
@@ -10,18 +10,7 @@
 			- <?php echo $pageTitle; ?>
 		</title>
 
-		<?php if($json !== null): ?>
-			<script type='text/javascript'>
-				var json = <?php echo json_encode($json); ?>;
-			</script>
-		<?php endif; ?>
-
-		<?php if($js !== null && is_array($js)): foreach($js as $src): ?>
-			<script type='text/javascript' src='/js/<?php echo $src; ?>.js'>
-			</script>
-		<?php endforeach; endif; ?>
-
-		<?php if($css !== null && is_array($css)): foreach($css as $href): ?>
+		<?php if(isset($css)): foreach($css as $href): ?>
 			<link
 				rel='stylesheet'
 				type='text/css'
@@ -35,8 +24,11 @@
 		<div id='Main'>
 			<hr>
 			<?php echo $content; ?>
-			<div class='clear'></div>
 		</div>
 	</body>
+
+	<?php if(isset($js)): foreach($js as $src): ?>
+		<script type='text/javascript' src='/js/<?php echo $src; ?>.js'>
+		</script>
+	<?php endforeach; endif; ?>
 </html>
-<?php }; ?>

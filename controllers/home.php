@@ -1,51 +1,60 @@
 <?php
-useModel('strings');
-useLib('markdown_view');
 
-$html = phpView('layouts/html');
-
-get('/', function() use ($html) {
+get('/', function() {
+	useLib('view/php');
+	useModel('strings');
 
 	$strings = strings\getStrings();
 
-	$index = phpView('home/index');
+	$html = view\php('layouts/html');
+	$index = view\php('home/index');
 
-	return $html(
-		'Home',
-		$index('This is foo!', 'And bar!', $strings)
-	);
+	return $html(array(
+		'pageTitle' => 'Home',
+		'content' => $index(array(
+			'foo' => 'This is foo!',
+			'bar' => 'And bar!',
+			'strings' => $strings
+		))
+	));
 });
 
-get('/get_example/:foo/:bar', function($foo, $bar) use ($html) {
+get('/get_example/:foo/:bar', function($foo, $bar) {
+	useLib('view/php');
 
-	$page = phpView('home/get_example');
+	$html = view\php('layouts/html');
+	$page = view\php('home/get_example');
 
-	return $html(
-		'GET example',
-		$page($foo, $bar)
-	);
+	return $html(array(
+		'pageTitle' => 'GET example',
+		'content' => $page(compact('foo', 'bar'))
+	));
 });
 
-get('/post_example', function() use ($html) {
+get('/post_example', function() {
+	useLib('view/php');
+	useLib('view/static');
 
-	$page = htmlView('home/post_example');
+	$html = view\php('layouts/html');
 
-	return $html(
-		'POST example',
-		$page()
-	);
+	return $html(array(
+		'pageTitle' => 'POST example',
+		'content' => view\static_('home/post_example')
+	));
 });
 
-post('/post_example', function() use ($html) {
+post('/post_example', function() {
+	useLib('view/php');
 
-	$page = phpView('home/post_example_post');
+	$html = view\php('layouts/html');
+	$page = view\php('home/post_example');
 	$foo = postVar('foo');
 	$bar = postVar('bar');
 
-	return $html(
-		'POST example',
-		$page($foo, $bar)
-	);
+	return $html(array(
+		'pageTitle' => 'POST example',
+		'content' => $page(compact('foo', 'bar'))
+	));
 });
 
 get('/json', function() {
@@ -65,11 +74,4 @@ get('/json', function() {
 	);
 
 	return json($data);
-});
-
-get('/readme', function() use ($html) {
-
-	$readme = mdView('home/README');
-	return $html('Readme', $readme());
-
 });

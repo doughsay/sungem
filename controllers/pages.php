@@ -1,20 +1,21 @@
 <?php
 
-$html = phpView('layouts/html');
+get('/pages/:page', function($page) {
+	useLib('view/static');
+	useLib('view/php');
 
-get('/pages/:page', function($page) use ($html) {
 	$titles = array(
 		'page1' => 'Simple Page 1',
 		'page2' => 'Simple Page 2'
 	);
 
 	if(!file_exists('../views/pages/'.$page.'.html')) {
-		$debug = getConfigVar('core', 'debug', true);
-		if($debug) { noSuchView('../views/pages/'.$page); }
+		if(debug()) { noSuchView('../views/pages/'.$page); }
 		else { error404(); }
 	}
 
-	$title = $titles[$page];
-	$page = htmlView('pages/'.$page);
-	return $html($title, $page());
+	$pageTitle = $titles[$page];
+	$html = view\php('layouts/html');
+	$content = view\static_('pages/'.$page);
+	return $html(compact('pageTitle', 'content'));
 });

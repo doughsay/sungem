@@ -1,31 +1,42 @@
 <?php
-useLib('auth_session');
-useModel('users');
 
-$html = phpView('layouts/html');
+get('/admin', function() {
+	useLib('auth/session');
+	useLib('view/php');
 
-get('/admin', function() use ($html) {
-	auth_session\requireLogin('/admin/users/login/');
+	auth\session\requireLogin('/admin/users/login/');
 
-	$username = $_SESSION['admin_user'];
-	$page = phpView('admin/users/index');
+	$username = sessionVar('admin_user');
+	$html = view\php('layouts/html');
+	$page = view\php('admin/users/index');
 
-	return $html('Admin Section', $page($username));
+	return $html(array(
+		'pageTitle' => 'Admin Section',
+		'content' => $page(compact('username'))
+	));
 });
 
-get('/admin/users/login', function() use ($html) {
+get('/admin/users/login', function() {
+	useLib('view/php');
 
-	$login = phpView('admin/users/login');
+	$html = view\php('layouts/html');
+	$login = view\php('admin/users/login');
 	$error = getVar('error', '0') === '1' ? true : false;
 
-	return $html('Login', $login($error));
+	return $html(array(
+		'pageTitle' => 'Login',
+		'content' => $login(compact('error'))
+	));
 });
 
 post('/admin/users/login', function() {
+	useModel('users');
+	useLib('auth/session');
+
 	$username = postVar('username');
 	$password = postVar('password');
 	if(users\validUser($username, $password)) {
-		auth_session\createSession($username);
+		auth\session\createSession($username);
 		redirect('/admin');
 	}
 	else {
@@ -34,7 +45,9 @@ post('/admin/users/login', function() {
 });
 
 get('/admin/users/logout', function() {
-	auth_session\destroySession();
+	useLib('auth/session');
+
+	auth\session\destroySession();
 	redirect('/admin/users/login/');
 	die();
 });
