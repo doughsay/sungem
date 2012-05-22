@@ -19,61 +19,80 @@ function assocFallback($a, $k, $f) {
 
 function error404() {
 	header('HTTP/1.0 404 Not Found');
-	if(!file_exists('../errors/404.php')) {
-		die('404 File not found');
+	if(file_exists('../views/errors/404.php')) {
+		useLib('view/php');
+		$error = view\php('errors/404');
+		$url = $_SERVER['REQUEST_URI'];
+		print($error(compact('url')));
 	}
-	$page = $_SERVER['REQUEST_URI'];
-	require_once('../errors/404.php');
+	else if(file_exists('../views/errors/404.html')) {
+		useLib('view/static');
+		$error = view\static_('errors/404');
+		print($error);
+	}
+	else {
+		print('404 File not found');
+	}
 	die();
 }
 
 function error500() {
 	header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
-	if(!file_exists('../errors/500.php')) {
-		die('500 Internal server error');
+	if(file_exists('../views/errors/500.html')) {
+		useLib('view/static');
+		$error = view\static_('errors/500');
+		print($error);
 	}
-	require_once('../errors/500.php');
+	else {
+		print('500 Internal server error');
+	}
 	die();
 }
 
+function msgOr404($msg) {
+	debug()
+		? die($msg)
+		: error404();
+}
+
+function msgOr500($msg) {
+	debug()
+		? die($msg)
+		: error500();
+}
+
 function noRoute($url) {
-	die("There is no route defined for the url: $url");
+	msgOr404("There is no route defined for the url: $url");
 }
 
 function noSuchView($viewFile) {
-	die("There is no such view file: $viewFile");
+	msgOr500("There is no such view file: $viewFile");
 }
 
 function noSuchModel($modelFile) {
-	die("There is no such model file: $modelFile");
+	msgOr500("There is no such model file: $modelFile");
 }
 
 function noSuchLib($libFile) {
-	die("There is no such library file: $libFile");
+	msgOr500("There is no such library file: $libFile");
 }
 
 function noSuchConf($confFile) {
-	die("There is no such config file: $confFile");
+	msgOr500("There is no such config file: $confFile");
 }
 
 function confError($v, $confFile) {
-	die("Config Error: there is no variable $$v defined in $confFile");
+	msgOr500("Config Error: there is no variable $$v defined in $confFile");
 }
 
 function getConfig($conf) {
 	if(!isset($GLOBALS['config'][$conf])) {
 		$confFile = "../config/$conf.php";
-		if(!file_exists($confFile)) {
-			if(debug()) { noSuchConf($confFile); }
-			else { error500(); }
-		}
+		if(!file_exists($confFile)) { noSuchConf($confFile); }
 		require_once("../config/$conf.php");
 		$pieces = explode('/', $conf);
 		$confName = array_pop($pieces);
-		if(!isset(${$confName})) {
-			if(debug()) { confError($confName, $confFile); }
-			else { error500(); }
-		}
+		if(!isset(${$confName})) { confError($confName, $confFile); }
 		$GLOBALS['config'][$conf] = ${$confName};
 	}
 	return $GLOBALS['config'][$conf];
@@ -87,10 +106,7 @@ function getConfigVar($conf, $k, $fallback = null) {
 function useLib($lib) {
 	if(!isset($GLOBALS['lib'][$lib])) {
 		$libFile = "../lib/$lib.php";
-		if(!file_exists($libFile)) {
-			if(debug()) { noSuchLib($libFile); }
-			else { error500(); }
-		}
+		if(!file_exists($libFile)) { noSuchLib($libFile); }
 		require_once("../lib/$lib.php");
 		$GLOBALS['lib'][$lib] = true;
 	}
@@ -99,10 +115,7 @@ function useLib($lib) {
 function useModel($model) {
 	if(!isset($GLOBALS['model'][$model])) {
 		$modelFile = "../models/$model.php";
-		if(!file_exists($modelFile)) {
-			if(debug()) { noSuchModel($modelFile); }
-			else { error500(); }
-		}
+		if(!file_exists($modelFile)) { noSuchModel($modelFile); }
 		require_once($modelFile);
 		$GLOBALS['model'][$model] = true;
 	}
@@ -125,8 +138,7 @@ function method() {
 		return 'post';
 	}
 	else {
-		if(debug()) { die('un-handled http request method'); }
-		else { error500(); }
+		msgOr500('un-handled http request method');
 	}
 }
 
@@ -282,9 +294,9 @@ function dispatch($url) {
 		if(preg_match($pattern, $url, $matches) === 1) {
 			array_shift($matches);
 			$params = $matches;
-			echo call_user_func_array($handler, $params);
-			pr($GLOBALS);
-			die();
+			print(call_user_func_array($handler, $params));
+			return true;
 		}
 	}
+	return false;
 }

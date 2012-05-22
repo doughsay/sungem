@@ -8,14 +8,7 @@ get('/download/*', function($path) {
 	// check to see if user is logged in here, or add some download tracking
 	// info to the db.
 
-	if(!file_exists($file)) {
-		if(debug()) {
-			die('There is no such file');
-		}
-		else {
-			error404();
-		}
-	}
+	if(!file_exists($file)) { msgOr404('There is no such file'); }
 
 	$finfo = finfo_open(FILEINFO_MIME_TYPE);
 	$mime = finfo_file($finfo, $file);

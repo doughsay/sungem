@@ -18,10 +18,5 @@ else {
 }
 
 registerRoutes();
-dispatch(url());
-pr(debug());
 
-// Checked all the routes. If it got this far, there was no route to handle
-// the passed url
-if(debug()) { noRoute(url()); }
-else { error404(); }
+dispatch(url()) || noRoute(url());

@@ -9,10 +9,8 @@ get('/pages/:page', function($page) {
 		'page2' => 'Simple Page 2'
 	);
 
-	if(!file_exists('../views/pages/'.$page.'.html')) {
-		if(debug()) { noSuchView('../views/pages/'.$page); }
-		else { error404(); }
-	}
+	$viewFile = "../views/pages/$page.html";
+	if(!file_exists($viewFile)) { msgOr404("There is no such view file: $viewFile"); }
 
 	$pageTitle = $titles[$page];
 	$html = view\php('layouts/html');
