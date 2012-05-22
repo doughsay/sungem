@@ -5,6 +5,12 @@ function pr($x) {
 	print('</pre>');
 }
 
+function debug() {
+	return isset($GLOBALS['config']['core']['debug'])
+		? $GLOBALS['config']['core']['debug']
+		: true;
+}
+
 function assocFallback($a, $k, $f) {
 	return isset($a[$k])
 		? $a[$k]
@@ -13,232 +19,108 @@ function assocFallback($a, $k, $f) {
 
 function error404() {
 	header('HTTP/1.0 404 Not Found');
-	if(!file_exists('../errors/404.php')) {
-		die('404 File not found');
+	if(file_exists('../views/errors/404.php')) {
+		useLib('view/php');
+		$error = view\php('errors/404');
+		$url = $_SERVER['REQUEST_URI'];
+		print($error(compact('url')));
 	}
-	$page = $_SERVER['REQUEST_URI'];
-	require_once('../errors/404.php');
+	else if(file_exists('../views/errors/404.html')) {
+		useLib('view/static');
+		$error = view\static_('errors/404');
+		print($error);
+	}
+	else {
+		print('404 File not found');
+	}
 	die();
 }
 
 function error500() {
 	header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
-	if(!file_exists('../errors/500.php')) {
-		die('500 Internal server error');
+	if(file_exists('../views/errors/500.html')) {
+		useLib('view/static');
+		$error = view\static_('errors/500');
+		print($error);
 	}
-	require_once('../errors/500.php');
+	else {
+		print('500 Internal server error');
+	}
 	die();
 }
 
-function noSuchController($controllerFile) {
-	die("There is no such controller file: $controllerFile");
+function msgOr404($msg) {
+	debug()
+		? die($msg)
+		: error404();
 }
 
-function noSuchAction($action, $controllerFile) {
-	die("There is no such action, $action, defined in $controllerFile");
+function msgOr500($msg) {
+	debug()
+		? die($msg)
+		: error500();
 }
 
-function noSuchView($viewFile) {
-	die("There is no such view file: $viewFile");
-}
-
-function noSuchLayout($layoutFile) {
-	die("There is no such layout file: $layoutFile");
-}
-
-function noSuchModel($modelFile) {
-	die("There is no such model file: $modelFile");
-}
-
-function noSuchSnippet($snippetFile) {
-	die("There is no such snippet file: $snippetFile");
-}
-
-function noSuchLib($libFile) {
-	die("There is no such library file: $libFile");
-}
-
-function noSuchConf($confFile) {
-	die("There is no such config file: $confFile");
-}
-
-function confError($f, $confFile) {
-	die("Config Error: there is no function $f() defined in $confFile");
-}
-
-function parseRequest() {
-	extract(getConfig('core'));
-	$routes = getMaybeConfig('routes');
-	$regexRoutes = getMaybeConfig('regexRoutes');
-
-	$args = array();
-	$url = '';
-
-	// default area is nothing
-	$area = '';
-
-	if(isset($_GET['url'])) {
-		$url = $_GET['url'];
-	}
-
-	// let's see if we can find a route matching the URL
-	$matchedRoute = null;
-
-	// check simple routes first
-	if(in_array($url, array_keys($routes))) {
-		$matchedRoute = $routes[$url];
-	}
-
-	// then check regex routes if no simple route was found
-	if($matchedRoute == null) {
-		foreach($regexRoutes as $pattern => $route) {
-			$num = preg_match($pattern, $url, $matches);
-			if($num > 0) {
-				array_shift($matches);
-				$route['args'] = $matches;
-				$matchedRoute = $route;
-				break;
-			}
-		}
-	}
-
-	if($matchedRoute != null) {
-		$route = $matchedRoute;
-
-		// if area is defined in the route, lets get its config (could override core config)
-		if(isset($route['area'])) {
-			$area = $route['area'];
-			extract(getConfig($area));
-		}
-
-		// some defaults
-		$controller = $defaultController;
-		$action = $defaultAction;
-		$layout = $defaultLayout;
-
-		// now we extract the route which could (and should) override at least one of the vars above
-		extract($route);
-	}
-	else {
-		$args = explode('/', $url);
-		if($args[count($args)-1] == '') { array_pop($args); }
-
-		if(isset($areas) && count($args) >= 1 && in_array($args[0], $areas)) {
-			$area = array_shift($args);
-		}
-
-		// include area config, could override core config
-		if($area !== '') {
-			extract(getConfig($area));
-		}
-
-		// some defaults
-		$controller = $defaultController;
-		$action = $defaultAction;
-		$layout = $defaultLayout;
-
-		// if they are specified by the args, get controller and action
-		if(count($args) >= 1) {
-			$controller = array_shift($args);
-		}
-
-		if(count($args) >= 1) {
-			$action = array_shift($args);
-		}
-	}
-
-	return array($area, $controller, $action, $layout, $args);
-}
-
-function snippet($name, $args = array()) {
-	$snippetFile = "../snippets/$name.php";
-	if(!file_exists($snippetFile)) {
-		$debug = getConfigVar('core', 'debug');
-		if($debug) { noSuchSnippet($snippetFile); }
-		else { error500(); }
-	}
-	extract(getConfig('core'));
-	extract($args);
-	ob_start();
-	require($snippetFile);
-	return ob_get_clean();
+function noRoute($url) {
+	msgOr404("There is no route defined for the url: $url");
 }
 
 function getConfig($conf) {
-	if(!isset($GLOBALS['configMemo'][$conf])) {
+	if(!isset($GLOBALS['config'][$conf])) {
 		$confFile = "../config/$conf.php";
-		if(!file_exists($confFile)) {
-			$debug = getConfigVar('core', 'debug');
-			if($debug) { noSuchConf($confFile); }
-			else { error500(); }
-		}
+		if(!file_exists($confFile)) { msgOr500("There is no such config file: $confFile"); }
 		require_once("../config/$conf.php");
-		if(!function_exists($conf)) {
-			$debug = getConfigVar('core', 'debug');
-			if($debug) { confError($conf, $confFile); }
-			else { error500(); }
-		}
-		$config = $conf();
-		$GLOBALS['configMemo'][$conf] = $config;
+		$pieces = explode('/', $conf);
+		$confName = array_pop($pieces);
+		if(!isset(${$confName})) { msgOr500("Config Error: there is no variable $$confName defined in $confFile"); }
+		$GLOBALS['config'][$conf] = ${$confName};
 	}
-	return $GLOBALS['configMemo'][$conf];
+	return $GLOBALS['config'][$conf];
 }
 
-function getMaybeConfig($conf) {
-	if(!isset($GLOBALS['configMemo'][$conf])) {
-		$confFile = "../config/$conf.php";
-		if(!file_exists($confFile)) {
-			return array();
-		}
-		require_once("../config/$conf.php");
-		if(!function_exists($conf)) {
-			$debug = getConfigVar('core', 'debug');
-			if($debug) { confError($conf, $confFile); }
-			else { error500(); }
-		}
-		$config = $conf();
-		$GLOBALS['configMemo'][$conf] = $config;
-	}
-	return $GLOBALS['configMemo'][$conf];
-}
-
-function getConfigVar($conf, $k) {
+function getConfigVar($conf, $k, $fallback = null) {
 	$a = getConfig($conf);
-	return assocFallback($a, $k, null);
+	return assocFallback($a, $k, $fallback);
 }
 
 function useLib($lib) {
-	if(!isset($GLOBALS['libMemo'][$lib])) {
+	if(!isset($GLOBALS['lib'][$lib])) {
 		$libFile = "../lib/$lib.php";
-		if(!file_exists($libFile)) {
-			$debug = getConfigVar('core', 'debug');
-			if($debug) { noSuchLib($libFile); }
-			else { error500(); }
-		}
+		if(!file_exists($libFile)) { msgOr500("There is no such library file: $libFile"); }
 		require_once("../lib/$lib.php");
-		$GLOBALS['libMemo'][$lib] = true;
+		$GLOBALS['lib'][$lib] = true;
 	}
 }
 
 function useModel($model) {
-	if(!isset($GLOBALS['modelMemo'][$model])) {
+	if(!isset($GLOBALS['model'][$model])) {
 		$modelFile = "../models/$model.php";
-		if(!file_exists($modelFile)) {
-			$debug = getConfigVar('core', 'debug');
-			if($debug) { noSuchModel($modelFile); }
-			else { error500(); }
-		}
+		if(!file_exists($modelFile)) { msgOr500("There is no such model file: $modelFile"); }
 		require_once($modelFile);
-		$GLOBALS['modelMemo'][$model] = true;
+		$GLOBALS['model'][$model] = true;
 	}
 }
 
 function redirect($url) { header("Location: $url"); }
 function isPost() { return $_SERVER['REQUEST_METHOD'] === 'POST'; }
 function isGet() { return $_SERVER['REQUEST_METHOD'] === 'GET'; }
-function post($k, $f = null) { return assocFallback($_POST, $k, $f); }
-function get($k, $f = null) { return assocFallback($_GET, $k, $f); }
-function files($k, $f = array()) { return assocFallback($_FILES, $k, $f); }
+function postVar($k, $f = null) { return assocFallback($_POST, $k, $f); }
+function getVar($k, $f = null) { return assocFallback($_GET, $k, $f); }
+function filesVar($k, $f = array()) { return assocFallback($_FILES, $k, $f); }
+function sessionVar($k, $f = null) { return assocFallback($_SESSION, $k, $f); }
+function url() { return getVar('url', ''); }
+
+function method() {
+	if(isGet()) {
+		return 'get';
+	}
+	else if(isPost()) {
+		return 'post';
+	}
+	else {
+		msgOr500('un-handled http request method');
+	}
+}
 
 function checkUploadedFile($file) {
 	switch($file['error']) {
@@ -251,8 +133,7 @@ function checkUploadedFile($file) {
 			return array(
 				false,
 				$file['error'],
-				'The uploaded file exceeds the upload_max_filesize directive'.
-					' in php.ini.'
+				'The uploaded file exceeds the upload_max_filesize directive in php.ini.'
 			);
 		case UPLOAD_ERR_FORM_SIZE:
 			//Value: 2; The uploaded file exceeds the MAX_FILE_SIZE
@@ -260,8 +141,7 @@ function checkUploadedFile($file) {
 			return array(
 				false,
 				$file['error'],
-				'The uploaded file exceeds the MAX_FILE_SIZE directive that'.
-					' was specified in the HTML form.'
+				'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.'
 			);
 		case UPLOAD_ERR_PARTIAL:
 			//Value: 3; The uploaded file was only partially uploaded.
@@ -309,4 +189,92 @@ function slug($phrase, $maxLength = 50) {
 	$result = preg_replace("/\s/", "-", $result);
 	return $result;
 }
-?>
+
+function ls($dir, $recursive = false, $extension = null, $prepend = '') {
+	if($extension !== null) {
+		$extension = strtolower($extension);
+	}
+	$contents = array();
+	if($handle = opendir($dir)) {
+		while(false !== ($entry = readdir($handle))) {
+			if ($entry != "." && $entry != "..") {
+
+				if($recursive && is_dir($dir . '/' . $entry)) {
+					$recursedContents = ls($dir . '/' . $entry, true, $extension, $prepend . $entry . '/');
+					$contents = array_merge($contents, $recursedContents);
+				}
+				else {
+
+					if($extension !== null) {
+						$pathinfo = pathinfo($dir . '/' . $entry);
+						if(isset($pathinfo['extension']) && strtolower($pathinfo['extension']) == $extension) {
+							$contents[] = $prepend . $entry;
+						}
+					}
+					else {
+						$contents[] = $prepend . $entry;
+					}
+
+				}
+			}
+		}
+		closedir($handle);
+	}
+	return $contents;
+}
+
+function registerRoutes() {
+	$controllers = ls('../controllers', true, 'php');
+	foreach($controllers as $controller) {
+		require_once("../controllers/$controller");
+	}
+}
+
+function register($method, $route, $f) {
+	$regexify = function($route) {
+		$pieces = explode('/', $route);
+		foreach($pieces as &$piece) {
+			if(substr($piece, 0, 1) === ':') {
+				$piece = '([-_A-Za-z0-9]+)';
+			}
+			if($piece === '*') {
+				$piece = '(.+?)';
+			}
+		}
+		return '#^' . implode('/', $pieces) . '/?$#';
+	};
+
+	if(substr($route, 0, 1) == '/') {
+		$route = ($route === '/')
+			? ''
+			: substr($route, 1);
+	}
+	$regex = $regexify($route);
+	$GLOBALS['routes'][$method][$regex] = $f;
+}
+
+function get($route, $f) {
+	register('get', $route, $f);
+};
+
+function post($route, $f) {
+	register('post', $route, $f);
+};
+
+function json($a) {
+    header('Content-Type:application/json');
+	return json_encode($a);
+}
+
+function dispatch($url) {
+	$routes = $GLOBALS['routes'];
+	foreach($routes[method()] as $pattern => $handler) {
+		if(preg_match($pattern, $url, $matches) === 1) {
+			array_shift($matches);
+			$params = $matches;
+			print(call_user_func_array($handler, $params));
+			return true;
+		}
+	}
+	return false;
+}

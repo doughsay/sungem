@@ -1,3 +1,4 @@
+<?php /* 404($url): */ ?>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -7,7 +8,7 @@
 		<h1>Error 404</h1>
 		<p>
 			The page you are looking for
-			<strong>'<?php echo $page; ?>'</strong>
+			<strong>'<?php echo $url; ?>'</strong>
 			isn't here.
 		</p>
 	</body>
