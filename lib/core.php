@@ -267,6 +267,7 @@ function json($a) {
 }
 
 function dispatch($url) {
+	if(!isset($GLOBALS['routes'])) { return false; }
 	$routes = $GLOBALS['routes'];
 	foreach($routes[method()] as $pattern => $handler) {
 		if(preg_match($pattern, $url, $matches) === 1) {
