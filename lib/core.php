@@ -133,8 +133,7 @@ function checkUploadedFile($file) {
 			return array(
 				false,
 				$file['error'],
-				'The uploaded file exceeds the upload_max_filesize directive'.
-					' in php.ini.'
+				'The uploaded file exceeds the upload_max_filesize directive in php.ini.'
 			);
 		case UPLOAD_ERR_FORM_SIZE:
 			//Value: 2; The uploaded file exceeds the MAX_FILE_SIZE
@@ -142,8 +141,7 @@ function checkUploadedFile($file) {
 			return array(
 				false,
 				$file['error'],
-				'The uploaded file exceeds the MAX_FILE_SIZE directive that'.
-					' was specified in the HTML form.'
+				'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.'
 			);
 		case UPLOAD_ERR_PARTIAL:
 			//Value: 3; The uploaded file was only partially uploaded.
