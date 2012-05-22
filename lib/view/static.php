@@ -5,7 +5,7 @@ function static_($view, $type = 'html') {
 	if(!isset($GLOBALS['views']['static'][$view])) {
 		$viewFile = "../views/$view.$type";
 
-		if(!file_exists($viewFile)) { noSuchView($viewFile); }
+		if(!file_exists($viewFile)) { msgOr500("There is no such view file: $viewFile"); }
 
 		ob_start();
 		require($viewFile);

@@ -65,34 +65,14 @@ function noRoute($url) {
 	msgOr404("There is no route defined for the url: $url");
 }
 
-function noSuchView($viewFile) {
-	msgOr500("There is no such view file: $viewFile");
-}
-
-function noSuchModel($modelFile) {
-	msgOr500("There is no such model file: $modelFile");
-}
-
-function noSuchLib($libFile) {
-	msgOr500("There is no such library file: $libFile");
-}
-
-function noSuchConf($confFile) {
-	msgOr500("There is no such config file: $confFile");
-}
-
-function confError($v, $confFile) {
-	msgOr500("Config Error: there is no variable $$v defined in $confFile");
-}
-
 function getConfig($conf) {
 	if(!isset($GLOBALS['config'][$conf])) {
 		$confFile = "../config/$conf.php";
-		if(!file_exists($confFile)) { noSuchConf($confFile); }
+		if(!file_exists($confFile)) { msgOr500("There is no such config file: $confFile"); }
 		require_once("../config/$conf.php");
 		$pieces = explode('/', $conf);
 		$confName = array_pop($pieces);
-		if(!isset(${$confName})) { confError($confName, $confFile); }
+		if(!isset(${$confName})) { msgOr500("Config Error: there is no variable $$confName defined in $confFile"); }
 		$GLOBALS['config'][$conf] = ${$confName};
 	}
 	return $GLOBALS['config'][$conf];
@@ -106,7 +86,7 @@ function getConfigVar($conf, $k, $fallback = null) {
 function useLib($lib) {
 	if(!isset($GLOBALS['lib'][$lib])) {
 		$libFile = "../lib/$lib.php";
-		if(!file_exists($libFile)) { noSuchLib($libFile); }
+		if(!file_exists($libFile)) { msgOr500("There is no such library file: $libFile"); }
 		require_once("../lib/$lib.php");
 		$GLOBALS['lib'][$lib] = true;
 	}
@@ -115,7 +95,7 @@ function useLib($lib) {
 function useModel($model) {
 	if(!isset($GLOBALS['model'][$model])) {
 		$modelFile = "../models/$model.php";
-		if(!file_exists($modelFile)) { noSuchModel($modelFile); }
+		if(!file_exists($modelFile)) { msgOr500("There is no such model file: $modelFile"); }
 		require_once($modelFile);
 		$GLOBALS['model'][$model] = true;
 	}
