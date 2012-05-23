@@ -235,7 +235,7 @@ function register($method, $route, $f) {
 		$pieces = explode('/', $route);
 		foreach($pieces as &$piece) {
 			if(substr($piece, 0, 1) === ':') {
-				$piece = '([-_A-Za-z0-9]+)';
+				$piece = '([.-_A-Za-z0-9]+)';
 			}
 			if($piece === '*') {
 				$piece = '(.+?)';

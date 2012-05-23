@@ -7,9 +7,7 @@ function static_($view, $type = 'html') {
 
 		if(!file_exists($viewFile)) { msgOr500("There is no such view file: $viewFile"); }
 
-		ob_start();
-		require($viewFile);
-		$c = trim(ob_get_clean());
+		$c = file_get_contents($viewFile);
 
 		$GLOBALS['views']['static'][$view] = $c;
 	}
