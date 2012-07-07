@@ -232,16 +232,7 @@ function registerRoutes() {
 
 function register($method, $route, $f) {
 	$regexify = function($route) {
-		$pieces = explode('/', $route);
-		foreach($pieces as &$piece) {
-			if(substr($piece, 0, 1) === ':') {
-				$piece = '([.-_A-Za-z0-9]+)';
-			}
-			if($piece === '*') {
-				$piece = '(.+?)';
-			}
-		}
-		return '#^' . implode('/', $pieces) . '/?$#';
+		return '#^' . $route . '/?$#';
 	};
 
 	if(substr($route, 0, 1) == '/') {
@@ -267,7 +258,6 @@ function json($a) {
 }
 
 function dispatch($url) {
-	if(!isset($GLOBALS['routes'])) { return false; }
 	$routes = $GLOBALS['routes'];
 	foreach($routes[method()] as $pattern => $handler) {
 		if(preg_match($pattern, $url, $matches) === 1) {
