@@ -26,8 +26,8 @@ function error404() {
 		print($error(compact('url')));
 	}
 	else if(file_exists('../views/errors/404.html')) {
-		useLib('view/static');
-		$error = view\static_('errors/404');
+		useLib('view/plain');
+		$error = view\plain('errors/404');
 		print($error);
 	}
 	else {
@@ -39,8 +39,8 @@ function error404() {
 function error500() {
 	header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
 	if(file_exists('../views/errors/500.html')) {
-		useLib('view/static');
-		$error = view\static_('errors/500');
+		useLib('view/plain');
+		$error = view\plain('errors/500');
 		print($error);
 	}
 	else {
