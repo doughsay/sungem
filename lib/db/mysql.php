@@ -2,15 +2,15 @@
 namespace db\mysql;
 
 function init() {
-	if(!isset($GLOBALS['mysql'])) {
+	if(!isset($GLOBALS['sungem']['mysql'])) {
 		extract(getConfig('db_mysql'));
-		$GLOBALS['mysql'] =  new \PDO($dsn, $username, $password, array(
+		$GLOBALS['sungem']['mysql'] =  new \PDO($dsn, $username, $password, array(
 			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
 		));
 	}
 
-	return $GLOBALS['mysql'];
+	return $GLOBALS['sungem']['mysql'];
 }
 
 function fetch($query, $params = array()) {

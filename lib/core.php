@@ -6,8 +6,8 @@ function pr($x) {
 }
 
 function debug() {
-	return isset($GLOBALS['config']['core']['debug'])
-		? $GLOBALS['config']['core']['debug']
+	return isset($GLOBALS['sungem']['config']['core']['debug'])
+		? $GLOBALS['sungem']['config']['core']['debug']
 		: true;
 }
 
@@ -66,16 +66,16 @@ function noRoute($url) {
 }
 
 function getConfig($conf) {
-	if(!isset($GLOBALS['config'][$conf])) {
+	if(!isset($GLOBALS['sungem']['config'][$conf])) {
 		$confFile = "../config/$conf.php";
 		if(!file_exists($confFile)) { msgOr500("There is no such config file: $confFile"); }
 		require_once("../config/$conf.php");
 		$pieces = explode('/', $conf);
 		$confName = array_pop($pieces);
 		if(!isset(${$confName})) { msgOr500("Config Error: there is no variable $$confName defined in $confFile"); }
-		$GLOBALS['config'][$conf] = ${$confName};
+		$GLOBALS['sungem']['config'][$conf] = ${$confName};
 	}
-	return $GLOBALS['config'][$conf];
+	return $GLOBALS['sungem']['config'][$conf];
 }
 
 function getConfigVar($conf, $k, $fallback = null) {
@@ -84,20 +84,28 @@ function getConfigVar($conf, $k, $fallback = null) {
 }
 
 function useLib($lib) {
-	if(!isset($GLOBALS['lib'][$lib])) {
+	if(!isset($GLOBALS['sungem']['lib'][$lib])) {
 		$libFile = "../lib/$lib.php";
 		if(!file_exists($libFile)) { msgOr500("There is no such library file: $libFile"); }
 		require_once("../lib/$lib.php");
-		$GLOBALS['lib'][$lib] = true;
+		$GLOBALS['sungem']['lib'][$lib] = true;
 	}
 }
 
 function useModel($model) {
-	if(!isset($GLOBALS['model'][$model])) {
+	if(!isset($GLOBALS['sungem']['model'][$model])) {
 		$modelFile = "../models/$model.php";
 		if(!file_exists($modelFile)) { msgOr500("There is no such model file: $modelFile"); }
 		require_once($modelFile);
-		$GLOBALS['model'][$model] = true;
+		$GLOBALS['sungem']['model'][$model] = true;
+	}
+}
+
+function autoloadLibs() {
+	if(isset($GLOBALS['sungem']['config']['core']['autoloadLibs']) && is_array($GLOBALS['sungem']['config']['core']['autoloadLibs'])) {
+		foreach($GLOBALS['sungem']['config']['core']['autoloadLibs'] as $lib) {
+			useLib($lib);
+		}
 	}
 }
 
@@ -241,7 +249,7 @@ function register($method, $route, $f) {
 			: substr($route, 1);
 	}
 	$regex = $regexify($route);
-	$GLOBALS['routes'][$method][$regex] = $f;
+	$GLOBALS['sungem']['routes'][$method][$regex] = $f;
 }
 
 function get($route, $f) {
@@ -258,7 +266,7 @@ function json($a) {
 }
 
 function dispatch($url) {
-	$routes = $GLOBALS['routes'];
+	$routes = $GLOBALS['sungem']['routes'];
 	foreach($routes[method()] as $pattern => $handler) {
 		if(preg_match($pattern, $url, $matches) === 1) {
 			array_shift($matches);

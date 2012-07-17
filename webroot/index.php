@@ -17,6 +17,8 @@ else {
 	ini_set('error_log', ROOT . '/logs/error.log');
 }
 
+autoloadLibs();
+
 registerRoutes();
 
 dispatch(url()) || noRoute(url());
