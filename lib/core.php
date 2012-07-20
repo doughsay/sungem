@@ -198,6 +198,12 @@ function slug($phrase, $maxLength = 50) {
 	return $result;
 }
 
+function unslug($str) {
+	$str = str_replace('-', ' ', $str);
+	$str = str_replace('_', ' ', $str);
+	return ucwords($str);
+}
+
 function ls($dir, $recursive = false, $extension = null, $prepend = '') {
 	if($extension !== null) {
 		$extension = strtolower($extension);
