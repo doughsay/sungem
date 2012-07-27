@@ -5,6 +5,12 @@ function pr($x) {
 	print('</pre>');
 }
 
+function vd($x) {
+	print('<pre>');
+	var_dump($x);
+	print('</pre>');
+}
+
 function debug() {
 	return isset($GLOBALS['sungem']['config']['core']['debug'])
 		? $GLOBALS['sungem']['config']['core']['debug']
