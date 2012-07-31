@@ -1,4 +1,4 @@
 <?php
-$core = array(
+$core = [
 	'debug' => true
-);
+];

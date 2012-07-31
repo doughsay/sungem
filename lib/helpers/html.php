@@ -2,8 +2,8 @@
 namespace helpers\html;
 
 function js($x) {
-	if(!is_array($x)) { $x = array($x); }
-	$a = array();
+	if(!is_array($x)) { $x = [$x]; }
+	$a = [];
 	foreach($x as $src) {
 		$a[] = "<script type='text/javascript' src='/js/$src.js'></script>";
 	}
@@ -11,8 +11,8 @@ function js($x) {
 }
 
 function css($x) {
-	if(!is_array($x)) { $x = array($x); }
-	$a = array();
+	if(!is_array($x)) { $x = [$x]; }
+	$a = [];
 	foreach($x as $href) {
 		$a[] = "<link rel='stylesheet' type='text/css' href='/css/$href.css'>";
 	}

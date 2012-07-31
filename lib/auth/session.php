@@ -17,6 +17,6 @@ function createSession($username) {
 }
 
 function destroySession() {
-	$_SESSION = array();
+	$_SESSION = [];
 	session_destroy();
 }

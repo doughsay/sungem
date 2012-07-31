@@ -4,21 +4,21 @@ namespace db\mysql;
 function init() {
 	if(!isset($GLOBALS['sungem']['mysql'])) {
 		extract(getConfig('db_mysql'));
-		$GLOBALS['sungem']['mysql'] =  new \PDO($dsn, $username, $password, array(
+		$GLOBALS['sungem']['mysql'] =  new \PDO($dsn, $username, $password, [
 			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
-		));
+		]);
 	}
 
 	return $GLOBALS['sungem']['mysql'];
 }
 
-function fetch($query, $params = array()) {
+function fetch($query, $params = []) {
 	$st = query($query, $params);
 	return $st->fetch();
 }
 
-function fetchAll($query, $params = array()) {
+function fetchAll($query, $params = []) {
 	$st = query($query, $params);
 	return $st->fetchAll();
 }
@@ -43,7 +43,7 @@ function delete($query, $params) {
 	return $st->rowCount();
 }
 
-function rowCount($query, $params = array()) {
+function rowCount($query, $params = []) {
 	$st = query($query, $params);
 	return $st->rowCount();
 }
@@ -53,7 +53,7 @@ function prepare($query) {
 	return $db->prepare($query);
 }
 
-function query($query, $params = array()) {
+function query($query, $params = []) {
 	$st = prepare($query);
 	$st->execute($params);
 	return $st;

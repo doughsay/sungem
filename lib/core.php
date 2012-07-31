@@ -114,7 +114,7 @@ function isPost() { return $_SERVER['REQUEST_METHOD'] === 'POST'; }
 function isGet() { return $_SERVER['REQUEST_METHOD'] === 'GET'; }
 function postVar($k, $f = null) { return assocFallback($_POST, $k, $f); }
 function getVar($k, $f = null) { return assocFallback($_GET, $k, $f); }
-function filesVar($k, $f = array()) { return assocFallback($_FILES, $k, $f); }
+function filesVar($k, $f = []) { return assocFallback($_FILES, $k, $f); }
 function sessionVar($k, $f = null) { return assocFallback($_SESSION, $k, $f); }
 function url() { return getVar('url', ''); }
 
@@ -134,58 +134,58 @@ function checkUploadedFile($file) {
 	switch($file['error']) {
 		case UPLOAD_ERR_OK:
 			//Value: 0; There is no error, the file uploaded with success.
-			return array(true, $file['error'], null);
+			return [true, $file['error'], null];
 		case UPLOAD_ERR_INI_SIZE:
 			//Value: 1; The uploaded file exceeds the upload_max_filesize
 			//directive in php.ini.
-			return array(
+			return [
 				false,
 				$file['error'],
 				'The uploaded file exceeds the upload_max_filesize directive in php.ini.'
-			);
+			];
 		case UPLOAD_ERR_FORM_SIZE:
 			//Value: 2; The uploaded file exceeds the MAX_FILE_SIZE
 			//directive that was specified in the HTML form.
-			return array(
+			return [
 				false,
 				$file['error'],
 				'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.'
-			);
+			];
 		case UPLOAD_ERR_PARTIAL:
 			//Value: 3; The uploaded file was only partially uploaded.
-			return array(
+			return [
 				false,
 				$file['error'],
 				'The uploaded file was only partially uploaded.'
-			);
+			];
 		case UPLOAD_ERR_NO_FILE:
 			//Value: 4; No file was uploaded.
-			return array(
+			return [
 				false,
 				$file['error'],
 				'No file was uploaded.'
-			);
+			];
 		case UPLOAD_ERR_NO_TMP_DIR:
 			//Value: 6; Missing a temporary folder.
-			return array(
+			return [
 				false,
 				$file['error'],
 				'Missing a temporary folder.'
-			);
+			];
 		case UPLOAD_ERR_CANT_WRITE:
 			//Value: 7; Failed to write file to disk.
-			return array(
+			return [
 				false,
 				$file['error'],
 				'Failed to write file to disk.'
-			);
+			];
 		case UPLOAD_ERR_EXTENSION:
 			//Value: 8; A PHP extension stopped the file upload.
-			return array(
+			return [
 				false,
 				$file['error'],
 				'A PHP extension stopped the file upload.'
-			);
+			];
 	}
 }
 
@@ -208,7 +208,7 @@ function ls($dir, $recursive = false, $extension = null, $prepend = '') {
 	if($extension !== null) {
 		$extension = strtolower($extension);
 	}
-	$contents = array();
+	$contents = [];
 	if($handle = opendir($dir)) {
 		while(false !== ($entry = readdir($handle))) {
 			if ($entry != "." && $entry != "..") {

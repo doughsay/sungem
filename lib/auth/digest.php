@@ -29,7 +29,7 @@ function getDigest() {
 function parseDigest($txt) {
 
 	// protect against missing data
-	$needed_parts = array(
+	$needed_parts = [
 		'nonce' => 1,
 		'nc' => 1,
 		'cnonce' => 1,
@@ -37,9 +37,9 @@ function parseDigest($txt) {
 		'username' => 1,
 		'uri' => 1,
 		'response' => 1
-	);
+	];
 
-	$data = array();
+	$data = [];
 	$keys = implode('|', array_keys($needed_parts));
 
 	preg_match_all(

@@ -7,7 +7,7 @@ function php($view) {
 
 		if(!file_exists($viewFile)) { msgOr500("There is no such view file: $viewFile"); }
 
-		$GLOBALS['sungem']['views']['php'][$view] = function($context = array()) use ($viewFile) {
+		$GLOBALS['sungem']['views']['php'][$view] = function($context = []) use ($viewFile) {
 			extract($context);
 			ob_start();
 			require($viewFile);
@@ -19,7 +19,7 @@ function php($view) {
 
 namespace view\php;
 
-function partial($view, $context = array()) {
+function partial($view, $context = []) {
 	$f = \view\php('partials/'.$view);
 	return $f($context);
 }
