@@ -1,5 +1,5 @@
 <?php
-define('ROOT', dirname(dirname(__FILE__)));
+define('ROOT', dirname(dirname($_SERVER["SCRIPT_FILENAME"])));
 
 require('../lib/core.php');
 if(file_exists('../config/core.php')) {
