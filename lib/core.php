@@ -17,6 +17,10 @@ function debug() {
 		: true;
 }
 
+function pluck($k, $xs) {
+	return array_map(function($x) use ($k) { return $x[$k]; }, $xs);
+}
+
 function assocFallback($a, $k, $f) {
 	return isset($a[$k])
 		? $a[$k]
